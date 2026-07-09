@@ -3,6 +3,7 @@ package infra
 import (
 	"fmt"
 
+	"github.com/ahmedsaleban/ansaru_dacwa/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -18,7 +19,7 @@ func DbConnect() {
 	if err != nil {
 		panic("failed to connect database")
 	}
-
+	db.AutoMigrate(models.User{})
 	DB = db
 
 }

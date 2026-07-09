@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/ahmedsaleban/ansaru_dacwa/dto"
@@ -50,5 +51,78 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 	c.JSON(StatusCode, gin.H{
 		"is_sucess": true,
 		"messege":   "User Created sucessfully!",
+	})
+}
+
+func (h *UserHandler) LoginUser(c *gin.Context) {
+	var RequestBody dto.LoginUserRequest
+	err := c.ShouldBindBodyWithJSON(&RequestBody)
+
+	if err != nil {
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"messege":    "failed to Bind  body request",
+			"is_success": false,
+		})
+		return
+	}
+
+	resp, StatusCode, err := h.Userservice.LoginUser(RequestBody)
+
+	if err != nil {
+		c.JSON(StatusCode, gin.H{
+			"is_success": false,
+			"messege":    err.Error(),
+		})
+		return
+	}
+
+	c.JSON(StatusCode, gin.H{
+		"is_sucess": true,
+		"messege":   "User Login sucessfully!",
+		"data":      resp,
+	})
+}
+
+func (h *UserHandler) WhoAmI(c *gin.Context) {
+
+	userID := c.GetUint("user_id")
+
+	user, statusCode, err := h.Userservice.WhoAmI(userID)
+	if err != nil {
+		c.JSON(statusCode, gin.H{
+			"is_success": false,
+			"message":    err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"is_success": true,
+		"message":    "User fetched successfully",
+		"data":       user,
+	})
+}
+
+func (h *UserHandler) RefreshToken(c *gin.Context) {
+	email := c.GetString("user_email")
+
+	response, StatusCode, err := h.Userservice.RefreshToken(email)
+
+	if err != nil {
+		slog.Info("failed to refresh token", "error", err.Error())
+
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message":    "Unauthorized",
+			"is_success": false,
+			"data":       nil,
+		})
+		return
+	}
+
+	c.JSON(StatusCode, gin.H{
+		"message":    "User refreshed successfully!",
+		"is_success": true,
+		"data":       response,
 	})
 }

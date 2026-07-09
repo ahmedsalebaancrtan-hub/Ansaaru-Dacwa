@@ -40,3 +40,9 @@ func (repo *UserRepo) GetUserByID(id uint) (*models.User, error) {
 
 	return &user, nil
 }
+
+func (r *UserRepo) GetAllusers() ([]models.User, error) {
+	var users []models.User
+	err := r.DB.Find(&users).Error
+	return users, err
+}

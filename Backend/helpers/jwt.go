@@ -38,8 +38,8 @@ func GenerateJwt(
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   email,
 			ExpiresAt: jwt.NewNumericDate(time.Unix(expireAt, 0)),
-			NotBefore: jwt.NewNumericDate(time.Now()),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
 		},
 	}
 

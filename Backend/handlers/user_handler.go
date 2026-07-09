@@ -83,7 +83,15 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 		"data":      resp,
 	})
 }
-
+func (h *UserHandler) ForgotPassword(c *gin.Context) {
+	var body dto.ForgotPasswordDTO
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	status, _ := h.Userservice.ForgotPassword(&body)
+	c.JSON(status, gin.H{"message": "If email exists, an OTP has been sent."})
+}
 func (h *UserHandler) WhoAmI(c *gin.Context) {
 
 	userID := c.GetUint("user_id")
@@ -103,10 +111,33 @@ func (h *UserHandler) WhoAmI(c *gin.Context) {
 		"data":       user,
 	})
 }
+func (h *UserHandler) ResetPassword(c *gin.Context) {
+	var body dto.ResetPasswordDTO
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
+	// 🔥 IMPORTANT: Call the Email OTP version, not the 2FA version
+	status, err := h.Userservice.ResetPassword(&body)
+	if err != nil {
+		c.JSON(status, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.JSON(status, gin.H{"message": "Password updated successfully using Email OTP"})
+}
 func (h *UserHandler) RefreshToken(c *gin.Context) {
 	email := c.GetString("user_email")
+	slog.Info("Refresh Email", "email", email)
 
+	if email == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message":    "Email missing from token",
+			"is_success": false,
+		})
+		return
+	}
 	response, StatusCode, err := h.Userservice.RefreshToken(email)
 
 	if err != nil {

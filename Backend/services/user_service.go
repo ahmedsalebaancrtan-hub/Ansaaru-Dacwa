@@ -113,7 +113,58 @@ func (svc *Userservice) LoginUser(data dto.LoginUserRequest) (response *dto.Logi
 		RefreshToken: RefreshToken,
 	}, http.StatusOK, nil
 }
+func (svc *Userservice) ForgotPassword(data *dto.ForgotPasswordDTO) (int, error) {
+	email := strings.ToLower(data.Email)
 
+	_, err := svc.repo.GetUserByEmail(email)
+	if err != nil {
+		return http.StatusOK, nil // User not found, but we don't tell the client
+	}
+
+	otp := helpers.GenerateNumericOTP(6)
+
+	// Save to DB
+	reset := models.PasswordResetToken{
+		Email:     email,
+		Token:     otp,
+		ExpiresAt: time.Now().Add(10 * time.Minute),
+	}
+	svc.repo.SaveResetToken(reset)
+
+	err = helpers.SendOTPEmail(email, otp)
+	if err != nil {
+		slog.Error("Failed to send email", "error", err)
+		return http.StatusInternalServerError, errors.New("failed to send otp email")
+	}
+
+	return http.StatusOK, nil
+}
+
+func (svc *Userservice) ResetPassword(data *dto.ResetPasswordDTO) (int, error) {
+	// 1. Look for the OTP in the PasswordResetToken table (Email OTP)
+	record, err := svc.repo.GetResetTokenByEmailAndOTP(data.Email, data.OTP)
+	if err != nil {
+		return http.StatusBadRequest, errors.New("invalid otp or email")
+	}
+
+	if time.Now().After(record.ExpiresAt) {
+		return http.StatusBadRequest, errors.New("otp expired")
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(data.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	user, _ := svc.repo.GetUserByEmail(data.Email)
+	if err := svc.repo.UpdatePasswordById(user.ID, string(hash)); err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	_ = svc.repo.DeleteResetToken(data.OTP)
+
+	return http.StatusOK, nil
+}
 func (svc *Userservice) WhoAmI(userID uint) (*dto.UserProfileResponse, int, error) {
 
 	user, err := svc.repo.GetUserByID(userID)
@@ -127,7 +178,6 @@ func (svc *Userservice) WhoAmI(userID uint) (*dto.UserProfileResponse, int, erro
 		Role:         string(user.Role),
 		CreatedAt:    user.CreatedAt,
 		UpdatedAt:    user.UpdatedAt,
-		DeletedAt:    user.DeletedAt,
 	}
 
 	return response, http.StatusOK, nil

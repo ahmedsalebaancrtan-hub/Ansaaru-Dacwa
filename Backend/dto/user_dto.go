@@ -22,12 +22,22 @@ type UserProfileResponse struct {
 	EmailAddress string    `json:"emailaddress"`
 	Role         string    `json:"role"`
 	CreatedAt    time.Time `json:"created_at"`
-	LastLogin    time.Time `json:"last_login"`
 	UpdatedAt    time.Time `json:"updated_at"`
-	DeletedAt    time.Time `json:"deleted_at"`
 }
+
+type ForgotPasswordDTO struct {
+	Email string `json:"email" binding:"required,email"`
+}
+
+type ResetPasswordDTO struct {
+	UserID      uint   `json:"user_id"`
+	Email       string `json:"email" binding:"required,email"`
+	OTP         string `json:"otp" binding:"required,len=6"`
+	NewPassword string `json:"new_password" binding:"required,min=6"`
+}
+
 type LoginUserResponse struct {
+	User         models.User `json:"User"`
 	AccessToken  string      `json:"Access_token"`
 	RefreshToken string      `json:"Refresh_token"`
-	User         models.User `json:"User"`
 }

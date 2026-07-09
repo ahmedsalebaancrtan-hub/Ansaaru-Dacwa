@@ -12,7 +12,6 @@ import (
 )
 
 func Authenticated() gin.HandlerFunc {
-
 	return func(c *gin.Context) {
 
 		authHeader := c.GetHeader("Authorization")
@@ -51,7 +50,6 @@ func Authenticated() gin.HandlerFunc {
 		)
 
 		if err != nil || !token.Valid {
-
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"is_success": false,
 				"message":    "Unauthenticated",
@@ -62,22 +60,21 @@ func Authenticated() gin.HandlerFunc {
 		if claims.IsRefreshToken {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"is_success": false,
-				"message":    "Invalid access token",
+				"message":    "Refresh token cannot access this endpoint",
 			})
 			return
 		}
 
 		c.Set("user_id", claims.UserID)
 		c.Set("userId", claims.UserID)
-
 		c.Set("email", claims.Subject)
-		c.Set("role", claims.Role)
+		c.Set("role", string(claims.Role))
 
 		slog.Info(
 			"Authenticated",
 			"userID", claims.UserID,
 			"email", claims.Subject,
-			"role", claims.Role,
+			"role", string(claims.Role),
 		)
 
 		c.Next()
@@ -85,7 +82,6 @@ func Authenticated() gin.HandlerFunc {
 }
 
 func RefreshAuthenticated() gin.HandlerFunc {
-
 	return func(c *gin.Context) {
 
 		authHeader := c.GetHeader("Authorization")
@@ -124,25 +120,30 @@ func RefreshAuthenticated() gin.HandlerFunc {
 		)
 
 		if err != nil || !token.Valid {
-
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"is_success": false,
-				"message":    "Unauthorized",
-			})
-			return
-		}
-
-		if !claims.IsRefreshToken {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"is_success": false,
 				"message":    "Invalid refresh token",
 			})
 			return
 		}
+		slog.Info(
+			"Refresh Claims",
+			"email", claims.Subject,
+			"role", claims.Role,
+			"userID", claims.UserID,
+			"isRefresh", claims.IsRefreshToken,
+		)
+		if !claims.IsRefreshToken {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"is_success": false,
+				"message":    "Access token cannot be used here",
+			})
+			return
+		}
 
-		c.Set("user_email", claims.Subject)
 		c.Set("user_id", claims.UserID)
-		c.Set("role", claims.Role)
+		c.Set("user_email", claims.Subject)
+		c.Set("role", string(claims.Role))
 
 		c.Next()
 	}

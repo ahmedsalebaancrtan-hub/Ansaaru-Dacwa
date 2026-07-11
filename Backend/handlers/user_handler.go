@@ -38,7 +38,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	StatusCode, err := h.Userservice.CreateUser(&RequestBody)
+	resp, StatusCode, err := h.Userservice.CreateUser(&RequestBody)
 
 	if err != nil {
 		c.JSON(StatusCode, gin.H{
@@ -51,6 +51,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 	c.JSON(StatusCode, gin.H{
 		"is_sucess": true,
 		"messege":   "User Created sucessfully!",
+		"data":      resp,
 	})
 }
 

@@ -17,8 +17,8 @@ func RegisterRepo(db *gorm.DB) *UserRepo {
 	}
 }
 
-func (repo *UserRepo) CreateUser(data models.User) error {
-	return repo.DB.Create(&data).Error
+func (repo *UserRepo) CreateUser(data *models.User) error {
+	return repo.DB.Create(data).Error
 }
 
 func (repo *UserRepo) GetUserByEmail(email string) (models.User, error) {
@@ -69,9 +69,4 @@ func (r *UserRepo) SaveResetToken(data models.PasswordResetToken) error {
 
 	r.DB.Where("email = ?", data.Email).Delete(&models.PasswordResetToken{})
 	return r.DB.Create(&data).Error
-}
-func (r *UserRepo) GetAllusers() ([]models.User, error) {
-	var users []models.User
-	err := r.DB.Find(&users).Error
-	return users, err
 }

@@ -25,14 +25,14 @@ func RegisterService(repo *repository.UserRepo) *Userservice {
 	}
 }
 
-func (svc *Userservice) CreateUser(data *dto.CreateUserDto) (int, error) {
+func (svc *Userservice) CreateUser(data *dto.CreateUserDto) (*dto.LoginUserResponse, int, error) {
 
 	email := strings.ToLower(data.EmailAddress)
 	_, err := svc.repo.GetUserByEmail(email)
 
 	if err == nil {
 		slog.Error("User with that email already exists")
-		return http.StatusConflict, errors.New("User with this email already exist")
+		return nil, http.StatusConflict, errors.New("User with this email already exist")
 
 	}
 
@@ -41,28 +41,48 @@ func (svc *Userservice) CreateUser(data *dto.CreateUserDto) (int, error) {
 	hashbytes, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
 	if err != nil {
 		slog.Error("failed to hash a password")
-		return http.StatusInternalServerError, errors.New(constants.DefaultErrorMsg)
+		return nil, http.StatusInternalServerError, errors.New(constants.DefaultErrorMsg)
 	}
 
 	data.Password = string(hashbytes)
 
 	slog.Info("Created user")
 
-	err = svc.repo.CreateUser(models.User{
+	user := models.User{
 		FullName:     data.FullName,
 		EmailAddress: email,
 		Password:     data.Password,
 		Role:         data.Role,
-	})
+	}
+
+	err = svc.repo.CreateUser(&user)
 
 	if err != nil {
 		slog.Error("failed to Created New User", "error", err)
-		return http.StatusInternalServerError, errors.New(constants.FailedToCreatedUser)
+		return nil, http.StatusInternalServerError, errors.New(constants.FailedToCreatedUser)
+	}
+
+	AccessToken, err := helpers.GenerateJwt(user.Role, user.ID, user.EmailAddress, time.Now().Add(15*time.Minute).Unix(), false)
+
+	if err != nil {
+		slog.Error("Failed to Generate access token")
+		return nil, http.StatusInternalServerError, errors.New(constants.DefaultErrorMsg)
+	}
+
+	RefreshToken, err := helpers.GenerateJwt(user.Role, user.ID, user.EmailAddress, time.Now().Add(72*time.Hour).Unix(), true)
+
+	if err != nil {
+		slog.Error("Failed to Generate refresh token token")
+		return nil, http.StatusInternalServerError, errors.New(constants.DefaultErrorMsg)
 	}
 
 	slog.Info("Successfully Created User")
 
-	return http.StatusCreated, nil
+	return &dto.LoginUserResponse{
+		User:         user,
+		AccessToken:  AccessToken,
+		RefreshToken: RefreshToken,
+	}, http.StatusCreated, nil
 
 }
 
@@ -118,7 +138,7 @@ func (svc *Userservice) ForgotPassword(data *dto.ForgotPasswordDTO) (int, error)
 
 	_, err := svc.repo.GetUserByEmail(email)
 	if err != nil {
-		return http.StatusOK, nil // User not found, but we don't tell the client
+		return http.StatusOK, nil
 	}
 
 	otp := helpers.GenerateNumericOTP(6)
@@ -141,7 +161,7 @@ func (svc *Userservice) ForgotPassword(data *dto.ForgotPasswordDTO) (int, error)
 }
 
 func (svc *Userservice) ResetPassword(data *dto.ResetPasswordDTO) (int, error) {
-	// 1. Look for the OTP in the PasswordResetToken table (Email OTP)
+
 	record, err := svc.repo.GetResetTokenByEmailAndOTP(data.Email, data.OTP)
 	if err != nil {
 		return http.StatusBadRequest, errors.New("invalid otp or email")

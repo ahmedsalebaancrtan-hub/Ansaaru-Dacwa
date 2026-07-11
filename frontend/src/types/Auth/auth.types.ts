@@ -19,6 +19,7 @@ export interface ForgotPasswordRequest {
 }
 
 export interface ResetPasswordRequest {
+  user_id?: number;
   email: string;
   otp: string;
   new_password: string;
@@ -61,6 +62,20 @@ export interface MessageApiResponse {
   message?: string;
   messege?: string;
   is_sucess?: boolean;
+  is_success?: boolean;
+  error?: string;
+}
+
+export interface UserProfileApiResponse {
+  data?: {
+    fullname: string;
+    emailaddress: string;
+    role: BackendUserRole;
+    created_at: string;
+    updated_at: string;
+  };
+  is_success: boolean;
+  message: string;
 }
 
 export interface AuthUser {
@@ -76,6 +91,14 @@ export interface AuthSession {
   user: AuthUser;
   accessToken: string;
   refreshToken: string;
+}
+
+export interface UserProfile {
+  fullName: string;
+  emailAddress: string;
+  role: UserRole;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface LoginResult {

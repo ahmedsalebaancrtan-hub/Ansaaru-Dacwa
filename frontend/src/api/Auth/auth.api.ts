@@ -12,16 +12,19 @@ import type {
   MessageResult,
   RegisterRequest,
   ResetPasswordRequest,
+  UserProfile,
+  UserProfileApiResponse,
   UserRole,
 } from "../../types/Auth/auth.types";
 
 // Endpoints-ka authentication-ka.
 const AUTH_ENDPOINTS = {
-  login: "/api/v1/auth/login",
-  forgotPassword: "/api/v1/auth/forgot-password",
-  resetPassword: "/api/v1/auth/reset-password",
-  createUser: "/api/v1/users",
-  register: "/api/v1/users",
+  register: "/api/users/register",
+  login: "/api/users/Login",
+  forgotPassword: "/api/users/forget-password",
+  resetPassword: "/api/users/reset",
+  whoAmI: "/api/users/whoami",
+  refreshToken: "/api/users/Refresh_token",
 };
 
 function normalizeRole(role: string): UserRole {
@@ -62,6 +65,7 @@ function getResponseMessage(
   return (
     response.message ??
     response.messege ??
+    response.error ??
     fallbackMessage
   );
 }
@@ -136,25 +140,25 @@ export async function createUser(
   request: CreateUserRequest,
 ): Promise<MessageResult> {
   const { data: response } =
-    await api.post<MessageApiResponse>(
-      AUTH_ENDPOINTS.createUser,
+    await api.post<LoginApiResponse>(
+      AUTH_ENDPOINTS.register,
       request,
     );
 
-  if (response.is_sucess === false) {
+  if (
+    !response.is_sucess ||
+    !response.data?.User ||
+    !response.data.Access_token ||
+    !response.data.Refresh_token
+  ) {
     throw new Error(
-      getResponseMessage(
-        response,
-        "Unable to create user",
-      ),
+      response.messege || "Unable to create user",
     );
   }
 
   return {
-    message: getResponseMessage(
-      response,
-      "User created successfully",
-    ),
+    message:
+      response.messege || "User created successfully",
   };
 }
 
@@ -165,25 +169,54 @@ export async function createUser(
  */
 export async function registerUser(
   request: RegisterRequest,
-): Promise<MessageResult> {
+): Promise<LoginResult> {
   const { data: response } =
-    await api.post<MessageApiResponse>(
+    await api.post<LoginApiResponse>(
       AUTH_ENDPOINTS.register,
       request,
     );
 
-  if (response.is_sucess === false) {
+  if (
+    !response.is_sucess ||
+    !response.data?.User ||
+    !response.data.Access_token ||
+    !response.data.Refresh_token
+  ) {
     throw new Error(
-      response.message ??
-        response.messege ??
-        "Unable to create account",
+      response.messege || "Unable to create account",
     );
   }
 
   return {
     message:
-      response.message ??
       response.messege ??
       "Account created successfully",
+
+    session: {
+      user: mapBackendUser(response.data.User),
+      accessToken: response.data.Access_token,
+      refreshToken: response.data.Refresh_token,
+    },
+  };
+}
+
+export async function getCurrentUser(): Promise<UserProfile> {
+  const { data: response } =
+    await api.get<UserProfileApiResponse>(
+      AUTH_ENDPOINTS.whoAmI,
+    );
+
+  if (!response.is_success || !response.data) {
+    throw new Error(
+      response.message || "Unable to fetch current user",
+    );
+  }
+
+  return {
+    fullName: response.data.fullname,
+    emailAddress: response.data.emailaddress,
+    role: normalizeRole(response.data.role),
+    createdAt: response.data.created_at,
+    updatedAt: response.data.updated_at,
   };
 }

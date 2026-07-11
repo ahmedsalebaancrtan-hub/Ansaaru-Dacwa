@@ -14,17 +14,20 @@ export const authStorage = {
   /**
    * Saves the authenticated session.
    *
-   * remember = true  -> localStorage
-   * remember = false -> sessionStorage
+   * Tokens are kept in localStorage so they survive page refreshes.
    */
-  saveSession(session: AuthSession, remember: boolean): void {
+  saveSession(session: AuthSession, _remember = true): void {
     this.clearSession();
 
-    const storage = remember ? localStorage : sessionStorage;
+    localStorage.setItem(STORAGE_KEYS.accessToken, session.accessToken);
+    localStorage.setItem(STORAGE_KEYS.refreshToken, session.refreshToken);
+    localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(session.user));
+  },
 
-    storage.setItem(STORAGE_KEYS.accessToken, session.accessToken);
-    storage.setItem(STORAGE_KEYS.refreshToken, session.refreshToken);
-    storage.setItem(STORAGE_KEYS.user, JSON.stringify(session.user));
+  updateSession(session: AuthSession): void {
+    localStorage.setItem(STORAGE_KEYS.accessToken, session.accessToken);
+    localStorage.setItem(STORAGE_KEYS.refreshToken, session.refreshToken);
+    localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(session.user));
   },
 
   getAccessToken(): string | null {

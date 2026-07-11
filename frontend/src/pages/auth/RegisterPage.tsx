@@ -182,7 +182,7 @@ function RegisterPage() {
       onSuccess: () => {
         setForm(initialForm);
 
-        navigate("/login", {
+        navigate("/dashboard", {
           replace: true,
         });
       },

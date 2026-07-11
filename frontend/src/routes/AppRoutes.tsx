@@ -1,124 +1,70 @@
 import {
+  createBrowserRouter,
   Navigate,
-  Route,
-  Routes,
-} from "react-router";
+} from "react-router-dom";
 
-import { useAuth } from "../hooks/auth/useAuth";
+import DashboardLayout from "../components/layout/DashboardLayout";
 
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "../pages/auth/ResetPasswordPage";
+import CreateUserPage from "../pages/auth/CreateUserPage";
 
 import DashboardPage from "../pages/dashboard/DashboardPage";
 
-
-import ProtectedRoute from "./ProtectedRoute";
 import AdminRoute from "./AdminRoute";
-import CreateUserPage from "../pages/auth/CreateUserPage";
 
-function AppRoutes() {
-  const { isAuthenticated } = useAuth();
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Navigate to="/login" replace />,
+  },
 
-  return (
-    <Routes>
-      {/* Redirect the root route based on authentication status */}
-      <Route
-        path="/"
-        element={
-          <Navigate
-            to={isAuthenticated ? "/dashboard" : "/login"}
-            replace
-          />
-        }
-      />
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPasswordPage />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPasswordPage />,
+  },
 
-      {/* Public authentication routes */}
-      <Route
-        path="/login"
-        element={
-          isAuthenticated ? (
-            <Navigate
-              to="/dashboard"
-              replace
-            />
-          ) : (
-            <LoginPage />
-          )
-        }
-      />
+  {
+    path: "/dashboard",
+    element: <DashboardLayout />,
 
-      <Route
-        path="/register"
-        element={
-          isAuthenticated ? (
-            <Navigate
-              to="/dashboard"
-              replace
-            />
-          ) : (
-            <RegisterPage />
-          )
-        }
-      />
+    children: [
+      {
+        index: true,
+        element: <DashboardPage />,
+      },
 
-      <Route
-        path="/forgot-password"
-        element={
-          isAuthenticated ? (
-            <Navigate
-              to="/dashboard"
-              replace
-            />
-          ) : (
-            <ForgotPasswordPage />
-          )
-        }
-      />
+      {
+        element: <AdminRoute />,
 
-      <Route
-        path="/reset-password"
-        element={
-          isAuthenticated ? (
-            <Navigate
-              to="/dashboard"
-              replace
-            />
-          ) : (
-            <ResetPasswordPage />
-          )
-        }
-      />
+        children: [
+          {
+            path: "users/create",
+            element: <CreateUserPage />,
+          },
+        ],
+      },
+    ],
+  },
 
-      {/* Routes that require authentication */}
-      <Route element={<ProtectedRoute />}>
-        <Route
-          path="/dashboard"
-          element={<DashboardPage />}
-        />
+  {
+    path: "*",
+    element: <Navigate to="/login" replace />,
+  },
+]);
 
-        {/* Routes that require an ADMIN role */}
-        <Route element={<AdminRoute />}>
-          <Route
-            path="/dashboard/users/create"
-            element={<CreateUserPage />}
-          />
-        </Route>
-      </Route>
-
-      {/* Redirect unknown routes */}
-      <Route
-        path="*"
-        element={
-          <Navigate
-            to={isAuthenticated ? "/dashboard" : "/login"}
-            replace
-          />
-        }
-      />
-    </Routes>
-  );
-}
-
-export default AppRoutes;
+export default router;

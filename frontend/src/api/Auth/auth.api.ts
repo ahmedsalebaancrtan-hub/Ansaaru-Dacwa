@@ -10,6 +10,7 @@ import type {
   LoginResult,
   MessageApiResponse,
   MessageResult,
+  RegisterRequest,
   ResetPasswordRequest,
   UserRole,
 } from "../../types/Auth/auth.types";
@@ -20,6 +21,7 @@ const AUTH_ENDPOINTS = {
   forgotPassword: "/api/v1/auth/forgot-password",
   resetPassword: "/api/v1/auth/reset-password",
   createUser: "/api/v1/users",
+  register: "/api/v1/users",
 };
 
 function normalizeRole(role: string): UserRole {
@@ -153,5 +155,35 @@ export async function createUser(
       response,
       "User created successfully",
     ),
+  };
+}
+
+
+/**
+ * Creates a new user account.
+ * Replace the endpoint if the backend uses another register route.
+ */
+export async function registerUser(
+  request: RegisterRequest,
+): Promise<MessageResult> {
+  const { data: response } =
+    await api.post<MessageApiResponse>(
+      AUTH_ENDPOINTS.register,
+      request,
+    );
+
+  if (response.is_sucess === false) {
+    throw new Error(
+      response.message ??
+        response.messege ??
+        "Unable to create account",
+    );
+  }
+
+  return {
+    message:
+      response.message ??
+      response.messege ??
+      "Account created successfully",
   };
 }

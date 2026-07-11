@@ -25,6 +25,7 @@ function AdminRoute() {
       />
     );
   }
+  
 
   return <Outlet />;
 }

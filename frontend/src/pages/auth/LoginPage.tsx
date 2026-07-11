@@ -303,6 +303,12 @@ function LoginPage() {
                 "Soo Gal Nidaamka"
               )}
             </button>
+            <Link
+  to="/register"
+  className="font-semibold text-[#7c2a13] hover:underline"
+>
+  Samee akoon cusub
+</Link>
           </form>
 
           <div className="mt-12 border-t border-[#eaded9] pt-7">

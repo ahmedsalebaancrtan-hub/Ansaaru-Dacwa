@@ -31,6 +31,12 @@ export interface CreateUserRequest {
   role: UserRole;
 }
 
+export interface RegisterRequest {
+  fullname: string;
+  emailaddress: string;
+  password: string;
+  role: UserRole;
+}
 export interface BackendUser {
   id: number;
   fullname: string;

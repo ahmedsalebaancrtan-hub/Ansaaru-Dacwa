@@ -78,8 +78,8 @@ const navigationGroups: NavigationGroup[] = [
         icon: Users,
       },
       {
-        name: "Waalidiinta",
-        path: "/dashboard/parents",
+        name: "Qoysaska",
+        path: "/dashboard/families",
         icon: UsersRound,
       },
       {
@@ -92,6 +92,11 @@ const navigationGroups: NavigationGroup[] = [
         path: "/dashboard/classes",
         icon: School,
       },
+      {
+  name: "Ardayda Fasallada",
+  path: "/dashboard/student-classes",
+  icon: UserCheck,
+},
       {
         name: "Macallimiinta",
         path: "/dashboard/teachers",

@@ -32,9 +32,7 @@ export interface CreateStudentRequest {
   middle_name: string;
   last_name: string;
   student_code: string;
-  family_name: string;
-  parent_one_name: string;
-  parent_one_phone: string;
+  family_id: number;
   gender: StudentGender;
 }
 

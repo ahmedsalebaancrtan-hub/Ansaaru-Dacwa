@@ -29,3 +29,12 @@ func (r *FamilyRepo) GetfamilyByID(FamilyID uint) (models.Family, error) {
 
 	return family, nil
 }
+
+func (r *FamilyRepo) ListFamily() ([]models.Family, error) {
+	var families []models.Family
+	err := r.DB.Find(&families).Error
+	if err != nil {
+		return nil, err
+	}
+	return families, nil
+}

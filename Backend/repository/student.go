@@ -23,7 +23,7 @@ func (r *StudentRepo) ListStudent() ([]models.Student, error) {
 
 	var student []models.Student
 
-	if err := r.DB.Find(&student).Error; err != nil {
+	if err := r.DB.Preload("Family").Find(&student).Error; err != nil {
 		return nil, err
 	}
 
@@ -33,7 +33,7 @@ func (r *StudentRepo) ListStudent() ([]models.Student, error) {
 func (r *StudentRepo) GetStudentByID(StudentID uint) (models.Student, error) {
 	var student models.Student
 
-	err := r.DB.Where("id = ?", StudentID).First(&student).Error
+	err := r.DB.Preload("Family").Where("id = ?", StudentID).First(&student).Error
 
 	if err != nil {
 		return models.Student{}, err

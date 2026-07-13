@@ -42,3 +42,13 @@ func (svc *FamilyService) CreateFamily(data dto.CreateFamilydto) (int, error) {
 	return http.StatusCreated, nil
 
 }
+
+func (svc *FamilyService) ListFamily() (int, []models.Family, error) {
+	data, err := svc.FamilyRepo.ListFamily()
+	if err != nil {
+		slog.Error("❌Failed to list family ", "error", err)
+		return http.StatusInternalServerError, nil, errors.New(constants.DefaultErrorMsg)
+	}
+
+	return http.StatusOK, data, nil
+}

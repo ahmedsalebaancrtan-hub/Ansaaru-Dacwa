@@ -23,6 +23,8 @@ import {
   useStudents,
 } from "../../hooks/school/useStudents";
 
+import { useFamilies } from "../../hooks/school/useFamilies";
+
 import type {
   StudentGender,
 } from "../../types/Admin/student.types";
@@ -33,9 +35,7 @@ interface StudentForm {
   middleName: string;
   lastName: string;
   gender: StudentGender | "";
-  familyName: string;
-  parentOneName: string;
-  parentOnePhone: string;
+  familyId: string;
 }
 
 interface StudentFormErrors {
@@ -44,9 +44,7 @@ interface StudentFormErrors {
   middleName?: string;
   lastName?: string;
   gender?: string;
-  familyName?: string;
-  parentOneName?: string;
-  parentOnePhone?: string;
+  familyId?: string;
 }
 
 const initialForm: StudentForm = {
@@ -55,9 +53,7 @@ const initialForm: StudentForm = {
   middleName: "",
   lastName: "",
   gender: "",
-  familyName: "",
-  parentOneName: "",
-  parentOnePhone: "",
+  familyId: "",
 };
 
 function isValidPhoneNumber(value: string): boolean {
@@ -98,6 +94,7 @@ function formatGender(gender: string): string {
 
 function StudentsPage() {
   const studentsQuery = useStudents();
+  const familiesQuery = useFamilies();
   const createStudentMutation =
     useCreateStudent();
 
@@ -199,21 +196,9 @@ function StudentsPage() {
         "Dooro gender-ka ardayga";
     }
 
-    if (form.familyName.trim().length < 2) {
-      newErrors.familyName =
-        "Magaca qoyska waa required";
-    }
-
-    if (form.parentOneName.trim().length < 2) {
-      newErrors.parentOneName =
-        "Magaca waalidka waa required";
-    }
-
-    if (
-      !isValidPhoneNumber(form.parentOnePhone)
-    ) {
-      newErrors.parentOnePhone =
-        "Geli telefoon sax ah";
+    if (!form.familyId) {
+      newErrors.familyId =
+        "Fadlan dooro qoyska";
     }
 
     return newErrors;
@@ -243,11 +228,7 @@ function StudentsPage() {
         middle_name: form.middleName.trim(),
         last_name: form.lastName.trim(),
         student_code: form.studentCode.trim(),
-        family_name: form.familyName.trim(),
-        parent_one_name:
-          form.parentOneName.trim(),
-        parent_one_phone:
-          form.parentOnePhone.replace(/\s+/g, ""),
+        family_id: Number(form.familyId),
         gender: form.gender,
       },
       {
@@ -509,13 +490,13 @@ function StudentsPage() {
               )}
             </div>
 
-            {/* Family name */}
+            {/* Family selection */}
             <div>
               <label
-                htmlFor="family-name"
+                htmlFor="family-id"
                 className="mb-2 block text-sm font-bold text-[#51433e]"
               >
-                Magaca Qoyska
+                Qoyska
               </label>
 
               <div className="relative">
@@ -524,108 +505,42 @@ function StudentsPage() {
                   className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#99847c]"
                 />
 
-                <input
-                  id="family-name"
-                  value={form.familyName}
+                <select
+                  id="family-id"
+                  value={form.familyId}
+                  disabled={familiesQuery.isLoading}
                   onChange={(event) =>
                     updateField(
-                      "familyName",
+                      "familyId",
                       event.target.value,
                     )
                   }
-                  placeholder="Reer Ahmed"
-                  className={`h-12 w-full rounded-xl border bg-[#fff8f5] pl-12 pr-4 outline-none transition focus:bg-white focus:ring-4 ${
-                    errors.familyName
+                  className={`h-12 w-full appearance-none rounded-xl border bg-[#fff8f5] pl-12 pr-4 outline-none transition focus:bg-white focus:ring-4 disabled:cursor-not-allowed disabled:opacity-60 ${
+                    errors.familyId
                       ? "border-red-400 focus:ring-red-100"
                       : "border-[#dfcbc4] focus:border-[#8b2408] focus:ring-orange-100"
                   }`}
-                />
+                >
+                  <option value="">
+                    {familiesQuery.isLoading
+                      ? "Qoysaska waa la soo qaadayaa..."
+                      : "Dooro qoyska"}
+                  </option>
+
+                  {(familiesQuery.data ?? []).map((family) => (
+                    <option
+                      key={family.id}
+                      value={family.id}
+                    >
+                      {family.familyName} — {family.Parent_one_Name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              {errors.familyName && (
+              {errors.familyId && (
                 <p className="mt-2 text-sm text-red-600">
-                  {errors.familyName}
-                </p>
-              )}
-            </div>
-
-            {/* Parent name */}
-            <div>
-              <label
-                htmlFor="parent-one-name"
-                className="mb-2 block text-sm font-bold text-[#51433e]"
-              >
-                Magaca Waalidka
-              </label>
-
-              <div className="relative">
-                <UserRound
-                  size={20}
-                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#99847c]"
-                />
-
-                <input
-                  id="parent-one-name"
-                  value={form.parentOneName}
-                  onChange={(event) =>
-                    updateField(
-                      "parentOneName",
-                      event.target.value,
-                    )
-                  }
-                  placeholder="Muhiim Ahmed"
-                  className={`h-12 w-full rounded-xl border bg-[#fff8f5] pl-12 pr-4 outline-none transition focus:bg-white focus:ring-4 ${
-                    errors.parentOneName
-                      ? "border-red-400 focus:ring-red-100"
-                      : "border-[#dfcbc4] focus:border-[#8b2408] focus:ring-orange-100"
-                  }`}
-                />
-              </div>
-
-              {errors.parentOneName && (
-                <p className="mt-2 text-sm text-red-600">
-                  {errors.parentOneName}
-                </p>
-              )}
-            </div>
-
-            {/* Parent phone */}
-            <div>
-              <label
-                htmlFor="parent-one-phone"
-                className="mb-2 block text-sm font-bold text-[#51433e]"
-              >
-                Telefoonka Waalidka
-              </label>
-
-              <div className="relative">
-                <Phone
-                  size={20}
-                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#99847c]"
-                />
-
-                <input
-                  id="parent-one-phone"
-                  type="tel"
-                  value={form.parentOnePhone}
-                  onChange={(event) =>
-                    updateField(
-                      "parentOnePhone",
-                      event.target.value,
-                    )
-                  }
-                  placeholder="+2524422665"
-                  className={`h-12 w-full rounded-xl border bg-[#fff8f5] pl-12 pr-4 outline-none transition focus:bg-white focus:ring-4 ${
-                    errors.parentOnePhone
-                      ? "border-red-400 focus:ring-red-100"
-                      : "border-[#dfcbc4] focus:border-[#8b2408] focus:ring-orange-100"
-                  }`}
-                />
-              </div>
-
-              {errors.parentOnePhone && (
-                <p className="mt-2 text-sm text-red-600">
-                  {errors.parentOnePhone}
+                  {errors.familyId}
                 </p>
               )}
             </div>

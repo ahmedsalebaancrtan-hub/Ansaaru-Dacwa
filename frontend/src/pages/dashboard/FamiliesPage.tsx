@@ -676,11 +676,19 @@ function FamiliesPage() {
                       </th>
 
                       <th className="px-6 py-4 text-xs font-black uppercase tracking-wide text-slate-500">
-                        Waalidka Koowaad
+                        Waalidka 1aad
                       </th>
 
                       <th className="px-6 py-4 text-xs font-black uppercase tracking-wide text-slate-500">
-                        Telefoon
+                        Telefoonka 1aad
+                      </th>
+
+                      <th className="px-6 py-4 text-xs font-black uppercase tracking-wide text-slate-500">
+                        Waalidka 2aad
+                      </th>
+
+                      <th className="px-6 py-4 text-xs font-black uppercase tracking-wide text-slate-500">
+                        Telefoonka 2aad
                       </th>
 
                       <th className="px-6 py-4 text-xs font-black uppercase tracking-wide text-slate-500">
@@ -726,6 +734,14 @@ function FamiliesPage() {
 
                           <td className="px-6 py-4 text-sm text-slate-500">
                             {family.parent_one_phone}
+                          </td>
+
+                          <td className="px-6 py-4 text-sm font-semibold text-[#4a3028]">
+                            {family.Parent_two_name || "—"}
+                          </td>
+
+                          <td className="px-6 py-4 text-sm text-slate-500">
+                            {family.Parent_two_phone || "—"}
                           </td>
 
                           <td className="px-6 py-4 text-sm text-slate-500">
@@ -782,18 +798,43 @@ function FamiliesPage() {
                             size={16}
                             className="text-[#8b2408]"
                           />
-
+                          <span className="font-bold">1aad:</span>
                           {
                             family.parent_one_phone
                           }
                         </p>
+
+                        {family.Parent_two_name && (
+                          <p className="flex items-center gap-2 text-slate-600">
+                            <UserRound
+                              size={16}
+                              className="text-[#8b2408]"
+                            />
+                            <span className="font-bold">2aad:</span>
+                            {
+                              family.Parent_two_name
+                            }
+                          </p>
+                        )}
+
+                        {family.Parent_two_phone && (
+                          <p className="flex items-center gap-2 text-slate-600">
+                            <Phone
+                              size={16}
+                              className="text-[#8b2408]"
+                            />
+                            <span className="font-bold">2aad:</span>
+                            {
+                              family.Parent_two_phone
+                            }
+                          </p>
+                        )}
 
                         <p className="flex items-center gap-2 text-slate-600">
                           <MapPin
                             size={16}
                             className="text-[#8b2408]"
                           />
-
                           {family.address}
                         </p>
                       </div>

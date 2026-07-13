@@ -2,14 +2,22 @@ import { api } from "../axiosInstance";
 
 import type {
   AddStudentClassRequest,
+  DeactivateStudentClassApiResponse,
   StudentClass,
   StudentClassApiResponse,
   StudentClassesApiResponse,
 } from "../../types/Admin/studentClass.types";
 
-// Route-kan ku beddel endpoint-ka saxda ah haddii uu ka duwan yahay.
-const STUDENT_CLASS_ENDPOINT =
-  "/api/v1/student-classes";
+// Endpoint builders — match route.go exactly (note: Add and Deactivate are capitalised).
+const STUDENT_CLASS_ADD_ENDPOINT = "/api/student_class/Add";
+
+function studentClassListEndpoint(classId: number): string {
+  return `/api/student_class/list/${classId}`;
+}
+
+function studentClassDeactivateEndpoint(studentId: number): string {
+  return `/api/student_class/Deactivate/${studentId}`;
+}
 
 function getResponseMessage(
   response: {
@@ -25,12 +33,13 @@ function getResponseMessage(
   );
 }
 
-export async function getStudentClasses(): Promise<
-  StudentClass[]
-> {
+// GET /api/student_class/list/:class_id  — roles: ADMIN | STUDENT_AFFAIRS | CASHIER
+export async function getStudentClassesByClassId(
+  classId: number,
+): Promise<StudentClass[]> {
   const { data: response } =
     await api.get<StudentClassesApiResponse>(
-      STUDENT_CLASS_ENDPOINT,
+      studentClassListEndpoint(classId),
     );
 
   const requestWasSuccessful =
@@ -41,7 +50,7 @@ export async function getStudentClasses(): Promise<
     throw new Error(
       getResponseMessage(
         response,
-        "Xogta fasallada ardayda lama soo heli karin",
+        "Ardayda fasalka lama soo heli karin",
       ),
     );
   }
@@ -49,12 +58,13 @@ export async function getStudentClasses(): Promise<
   return response.data ?? [];
 }
 
+// POST /api/student_class/Add  — roles: ADMIN | STUDENT_AFFAIRS
 export async function addStudentToClass(
   request: AddStudentClassRequest,
 ): Promise<StudentClass | null> {
   const { data: response } =
     await api.post<StudentClassApiResponse>(
-      STUDENT_CLASS_ENDPOINT,
+      STUDENT_CLASS_ADD_ENDPOINT,
       request,
     );
 
@@ -72,4 +82,27 @@ export async function addStudentToClass(
   }
 
   return response.data ?? null;
+}
+
+// PUT /api/student_class/Deactivate/:student_id  — roles: ADMIN | STUDENT_AFFAIRS
+export async function deactivateStudentClass(
+  studentId: number,
+): Promise<void> {
+  const { data: response } =
+    await api.put<DeactivateStudentClassApiResponse>(
+      studentClassDeactivateEndpoint(studentId),
+    );
+
+  const requestWasSuccessful =
+    response.is_sucess !== false &&
+    response.is_success !== false;
+
+  if (!requestWasSuccessful) {
+    throw new Error(
+      getResponseMessage(
+        response,
+        "Ardayga fasalka laga saari karin",
+      ),
+    );
+  }
 }

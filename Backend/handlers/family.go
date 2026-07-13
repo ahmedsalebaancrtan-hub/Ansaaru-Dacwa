@@ -54,3 +54,20 @@ func (h *FamilyHandler) CreateFamily(c *gin.Context) {
 		"messege":    "family Created successfully",
 	})
 }
+
+func (h *FamilyHandler) FindAll(c *gin.Context) {
+	StatusCode, data, err := h.FamilyService.ListFamily()
+
+	if err != nil {
+		c.JSON(StatusCode, gin.H{
+			"is_success": false,
+			"messege":    err.Error(),
+		})
+		return
+	}
+	c.JSON(StatusCode, gin.H{
+		"is_success": true,
+		"messege":    "family lists Fetched successfully",
+		"data":       data,
+	})
+}

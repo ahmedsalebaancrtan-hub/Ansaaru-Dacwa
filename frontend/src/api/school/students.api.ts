@@ -7,8 +7,9 @@ import type {
   StudentsApiResponse,
 } from "../../types/Admin/student.types";
 
-// Ku beddel route-ka saxda ah haddii backend-ku ka duwan yahay.
-const STUDENT_ENDPOINT = "/api/v1/students";
+// Endpoints — match route.go exactly.
+const STUDENT_LIST_ENDPOINT   = "/api/student/list";
+const STUDENT_CREATE_ENDPOINT = "/api/student/create";
 
 function getResponseMessage(
   response: {
@@ -24,10 +25,11 @@ function getResponseMessage(
   );
 }
 
+// GET /api/student/list  — roles: ADMIN | STUDENT_AFFAIRS | CASHIER
 export async function getStudents(): Promise<Student[]> {
   const { data: response } =
     await api.get<StudentsApiResponse>(
-      STUDENT_ENDPOINT,
+      STUDENT_LIST_ENDPOINT,
     );
 
   const requestWasSuccessful =
@@ -46,12 +48,13 @@ export async function getStudents(): Promise<Student[]> {
   return response.data ?? [];
 }
 
+// POST /api/student/create  — roles: ADMIN | STUDENT_AFFAIRS
 export async function createStudent(
   request: CreateStudentRequest,
 ): Promise<Student | null> {
   const { data: response } =
     await api.post<StudentApiResponse>(
-      STUDENT_ENDPOINT,
+      STUDENT_CREATE_ENDPOINT,
       request,
     );
 

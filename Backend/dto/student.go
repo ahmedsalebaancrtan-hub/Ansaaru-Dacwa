@@ -5,8 +5,6 @@ type CreateStudentDto struct {
 	MiddleName     string `json:"middle_name" binding:"required"`
 	LastName       string `json:"last_name" binding:"required"`
 	StudentCode    string `json:"student_code" binding:"required"`
-	FamilyName     string `json:"family_name" binding:"required"`
-	ParentOneName  string `json:"parent_one_name" binding:"required"`
-	ParentOnePhone string `json:"parent_one_phone" binding:"required"`
+	FamilyID       uint   `json:"family_id" binding:"required"`
 	Gender         string `json:"gender" binding:"required"`
 }

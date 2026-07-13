@@ -36,6 +36,7 @@ func RegIsterRouter(r *gin.Engine) {
 	FamilyGroup := ApiGroup.Group("/family")
 	{
 		FamilyGroup.POST("/create", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "CASHIER"), FamilyHandler.CreateFamily)
+		FamilyGroup.GET("/list", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "STUDENT_AFFAIRS", "CASHIER"), FamilyHandler.FindAll)
 	}
 
 	StudentGroup := ApiGroup.Group("/student")

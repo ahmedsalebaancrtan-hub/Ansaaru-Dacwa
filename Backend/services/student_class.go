@@ -34,7 +34,7 @@ func (svc *StudentClassService) AddStudentToClass(data *dto.AddStudentClassDto) 
 
 	}
 
-	err := svc.StudentClassRepo.AddStudentClass(data.ClassID, data.StudentID)
+	err := svc.StudentClassRepo.AddStudentClass(data.StudentID, data.ClassID)
 
 	if err != nil {
 		slog.Info("failed to add student to a class", "error", err)

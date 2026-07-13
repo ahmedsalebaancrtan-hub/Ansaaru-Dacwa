@@ -25,23 +25,12 @@ func NewStudenService(StudentRepo *repository.StudentRepo, familyRepo *repositor
 }
 
 func (svc *StudentService) CreateStudent(data dto.CreateStudentDto) (int, error) {
-	// Look up family by phone
 	var existingFamily models.Family
-	err := svc.familyRepo.DB.Where("parent_one_phone = ?", data.ParentOnePhone).First(&existingFamily).Error
+	err := svc.familyRepo.DB.First(&existingFamily, data.FamilyID).Error
 
 	if err != nil {
-		// Family not found, create new one
-		existingFamily = models.Family{
-			FamilyName:     data.FamilyName,
-			ParentOneName:  data.ParentOneName,
-			ParentOnePhone: data.ParentOnePhone,
-		}
-		if err := svc.familyRepo.CreateFamily(existingFamily); err != nil {
-			slog.Info("failed to create family dynamically", "error", err)
-			return http.StatusInternalServerError, errors.New("failed to create family for new student")
-		}
-		// Fetch again to get the inserted ID if Create didn't populate it (Gorm usually populates it though)
-		svc.familyRepo.DB.Where("parent_one_phone = ?", data.ParentOnePhone).First(&existingFamily)
+		slog.Info("Family not found", "error", err)
+		return http.StatusBadRequest, errors.New("selected family not found")
 	}
 
 	var NewStudent = models.Student{

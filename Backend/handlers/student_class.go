@@ -12,100 +12,97 @@ import (
 )
 
 type StudentClassHandler struct {
-	STudentClassService *services.StudentClassService
+	StudentClassService *services.StudentClassService
 }
 
-func RegisterStudentClass() *StudentClassHandler {
-	StudentRepo := repository.NewSTudentRepo(infra.DB)
-	StudentClassRepo := repository.NewStudentClassRepo(infra.DB)
-	StudentClassService := services.NewSTudentClassServ(StudentClassRepo, StudentRepo)
+func RegisterStudentClassHandler() *StudentClassHandler {
+	studentRepo := repository.NewStudentRepo(infra.DB)
+	studentClassRepo := repository.NewStudentClassRepo(infra.DB)
+	studentClassService := services.NewStudentClassService(studentClassRepo, studentRepo)
 
 	return &StudentClassHandler{
-		STudentClassService: StudentClassService,
+		StudentClassService: studentClassService,
 	}
-
 }
 
-func (h *StudentClassHandler) AddSTudentClass(c *gin.Context) {
-
+func (h *StudentClassHandler) AddStudentClass(c *gin.Context) {
 	var body dto.AddStudentClassDto
 
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"messege":    "failed to Bind  body request",
 			"is_success": false,
+			"message":    "failed to bind request body",
 			"error":      err.Error(),
 		})
 		return
-
 	}
 
-	StatusCode, err := h.STudentClassService.AddStudentToClass(&body)
-
+	statusCode, err := h.StudentClassService.AddStudentToClass(&body)
 	if err != nil {
-		c.JSON(StatusCode, gin.H{
+		c.JSON(statusCode, gin.H{
 			"is_success": false,
-			"messege":    err.Error(),
+			"message":    err.Error(),
 		})
 		return
 	}
 
-	c.JSON(StatusCode, gin.H{
+	c.JSON(statusCode, gin.H{
 		"is_success": true,
-		"messege":    "Student Created successfully",
+		"message":    "Student assigned to class successfully!",
 	})
 }
 
 func (h *StudentClassHandler) FindClassStudentByClassID(c *gin.Context) {
-	IdStr := c.Param("class_id")
-	id, err := strconv.Atoi(IdStr)
+	idStr := c.Param("class_id")
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"messege":    "failed to get classId param",
 			"is_success": false,
+			"message":    "failed to parse class_id parameter",
 			"error":      err.Error(),
 		})
 		return
 	}
-	status, classStudent, err := h.STudentClassService.ListSTudentClass(uint(id))
 
+	status, classStudents, err := h.StudentClassService.ListStudentClass(uint(id))
 	if err != nil {
 		c.JSON(status, gin.H{
 			"is_success": false,
-			"messege":    err.Error(),
+			"message":    err.Error(),
 		})
 		return
 	}
 
 	c.JSON(status, gin.H{
-		"messege":    "class fetched successfully",
 		"is_success": true,
-		"data":       classStudent,
+		"message":    "Class students fetched successfully!",
+		"data":       classStudents,
 	})
 }
-func (h *StudentClassHandler) DeactivateStudentclass(c *gin.Context) {
-	IdStr := c.Param("student_id")
-	id, err := strconv.Atoi(IdStr)
+
+func (h *StudentClassHandler) DeactivateStudentClass(c *gin.Context) {
+	idStr := c.Param("student_id")
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"messege":    "failed to get student_id param",
 			"is_success": false,
+			"message":    "failed to parse student_id parameter",
 			"error":      err.Error(),
 		})
 		return
 	}
-	status, err := h.STudentClassService.DeactiveStudentClass(uint(id))
 
+	status, err := h.StudentClassService.DeactivateStudentClass(uint(id))
 	if err != nil {
 		c.JSON(status, gin.H{
 			"is_success": false,
-			"messege":    err.Error(),
+			"message":    err.Error(),
 		})
 		return
 	}
 
 	c.JSON(status, gin.H{
-		"messege":    "Deactived student class successfully",
 		"is_success": true,
+		"message":    "Student class deactivated successfully!",
 	})
 }

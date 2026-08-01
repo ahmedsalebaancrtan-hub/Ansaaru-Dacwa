@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
+	"path/filepath"
+	"strconv"
 
 	"github.com/ahmedsaleban/ansaru_dacwa/dto"
 	"github.com/ahmedsaleban/ansaru_dacwa/infra"
@@ -15,44 +18,64 @@ type StudentHandler struct {
 }
 
 func RegisterStudentHandler() *StudentHandler {
-
-	Familyrepo := repository.NewFamilyRepo(infra.DB)
-	StudentRepo := repository.NewSTudentRepo(infra.DB)
-	StudentService := services.NewStudenService(StudentRepo, Familyrepo)
+	familyRepo := repository.NewFamilyRepo(infra.DB)
+	studentRepo := repository.NewStudentRepo(infra.DB)
+	classRepo := repository.NewClassRegister(infra.DB)
+	studentService := services.NewStudentService(studentRepo, familyRepo, &classRepo)
 
 	return &StudentHandler{
-		StudentService: StudentService,
+		StudentService: studentService,
 	}
-
 }
-
 func (h *StudentHandler) CreateStudent(c *gin.Context) {
-
 	var body dto.CreateStudentDto
 
-	if err := c.ShouldBindJSON(&body); err != nil {
+	// Gin Multipart Form binding
+	if err := c.ShouldBind(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"messege":    "failed to Bind  body request",
 			"is_success": false,
+			"message":    "failed to bind body request",
 			"error":      err.Error(),
 		})
 		return
-
 	}
 
-	StatusCode, err := h.StudentService.CreateStudent(body)
+	// 1. Picture Upload Handling (OPTIONAL)
+	var imagePath string
+	file, err := c.FormFile("picture")
+	if err == nil && file != nil { // Kaliya haddii uu sawir jiro ayaa la process gareynayaa
+		// Max Size 100KB
+		if file.Size > 100*1024 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"is_success": false,
+				"message":    "Picture size must be less than 100KB",
+			})
+			return
+		}
 
+		filename := fmt.Sprintf("%s_%s", body.StudentCode, filepath.Base(file.Filename))
+		imagePath = filepath.Join("uploads/students", filename)
+		if err := c.SaveUploadedFile(file, imagePath); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"is_success": false,
+				"message":    "Failed to save image file",
+			})
+			return
+		}
+	}
+
+	statusCode, err := h.StudentService.CreateStudent(body, imagePath)
 	if err != nil {
-		c.JSON(StatusCode, gin.H{
+		c.JSON(statusCode, gin.H{
 			"is_success": false,
-			"messege":    err.Error(),
+			"message":    err.Error(),
 		})
 		return
 	}
 
-	c.JSON(StatusCode, gin.H{
+	c.JSON(statusCode, gin.H{
 		"is_success": true,
-		"messege":    "Student Created successfully",
+		"message":    "Student registered successfully!",
 	})
 }
 
@@ -61,14 +84,40 @@ func (h *StudentHandler) ListStudent(c *gin.Context) {
 	if err != nil {
 		c.JSON(status, gin.H{
 			"is_success": false,
-			"messege":    err.Error(),
+			"message":    err.Error(),
 		})
 		return
 	}
 	c.JSON(status, gin.H{
 		"is_success": true,
-		"messege":    "Students Listed successfully",
+		"message":    "Students fetched successfully!",
 		"data":       data,
 	})
+}
 
+func (h *StudentHandler) GetStudentByID(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"is_success": false,
+			"message":    "Invalid student id parameter",
+		})
+		return
+	}
+
+	status, student, err := h.StudentService.GetStudentByID(uint(id))
+	if err != nil {
+		c.JSON(status, gin.H{
+			"is_success": false,
+			"message":    err.Error(),
+		})
+		return
+	}
+
+	c.JSON(status, gin.H{
+		"is_success": true,
+		"message":    "Student details fetched successfully!",
+		"data":       student,
+	})
 }

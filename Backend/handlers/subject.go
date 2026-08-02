@@ -12,16 +12,16 @@ import (
 )
 
 type SubjectHandler struct {
-	SubjectService services.SubjectService
+	SubjectService *services.SubjectService
 }
 
 func RegisterSubjectHandler() *SubjectHandler {
 	subjectRepo := repository.NewSubjectRepo(infra.DB)
 	classRepo := repository.NewClassRegister(infra.DB)
-	subjectSvc := services.RegisterSubjectService(&subjectRepo, &classRepo)
+	subjectSvc := services.RegisterSubjectService(subjectRepo, &classRepo)
 
 	return &SubjectHandler{
-		SubjectService: *subjectSvc,
+		SubjectService: subjectSvc,
 	}
 }
 
@@ -70,12 +70,12 @@ func (h *SubjectHandler) FindAll(c *gin.Context) {
 }
 
 func (h *SubjectHandler) FindByClassID(c *gin.Context) {
-	classIDStr := c.Param("classid")
+	classIDStr := c.Param("class_id") // Saxida param key-ga
 	classID, err := strconv.Atoi(classIDStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"is_success": false,
-			"message":    "invalid classid parameter",
+			"message":    "invalid class_id parameter",
 		})
 		return
 	}

@@ -12,25 +12,25 @@ import (
 )
 
 type SubjectService struct {
-	subjectRepo repository.SubjectRepo
-	classRepo   repository.ClassRepo
+	subjectRepo *repository.SubjectRepo
+	classRepo   *repository.ClassRepo
 }
 
 func RegisterSubjectService(repo *repository.SubjectRepo, classRepo *repository.ClassRepo) *SubjectService {
 	return &SubjectService{
-		subjectRepo: *repo,
-		classRepo:   *classRepo,
+		subjectRepo: repo,
+		classRepo:   classRepo,
 	}
 }
 
 func (svc *SubjectService) AssignSubjects(data *dto.AssignSubjectsDTO) (int, []models.Subject, error) {
-	// 1. Verify Class Exists
+	// 1. Hubi in fasalku jiro
 	_, err := svc.classRepo.FindById(data.ClassID)
 	if err != nil {
 		return http.StatusNotFound, nil, errors.New("selected class does not exist")
 	}
 
-	// 2. Prepare models for bulk insertion
+	// 2. Diyaari models
 	var subjectsToCreate []models.Subject
 	for _, item := range data.Subjects {
 		subjectsToCreate = append(subjectsToCreate, models.Subject{
@@ -40,7 +40,7 @@ func (svc *SubjectService) AssignSubjects(data *dto.AssignSubjectsDTO) (int, []m
 		})
 	}
 
-	// 3. Save to database
+	// 3. Save DB
 	err = svc.subjectRepo.CreateBulk(subjectsToCreate)
 	if err != nil {
 		slog.Error("failed to assign subjects", "error", err)

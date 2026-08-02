@@ -9,8 +9,8 @@ type SubjectRepo struct {
 	DB *gorm.DB
 }
 
-func NewSubjectRepo(db *gorm.DB) SubjectRepo {
-	return SubjectRepo{
+func NewSubjectRepo(db *gorm.DB) *SubjectRepo {
+	return &SubjectRepo{
 		DB: db,
 	}
 }

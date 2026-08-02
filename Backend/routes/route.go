@@ -63,7 +63,7 @@ func RegIsterRouter(r *gin.Engine) {
 	{
 		SubjectGroup.POST("/assign", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "STUDENT_AFFAIRS"), subjectHandler.AssignSubjects)
 		SubjectGroup.GET("/list", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "STUDENT_AFFAIRS", "CASHIER"), subjectHandler.FindAll)
-		SubjectGroup.GET("/class/:classid", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "STUDENT_AFFAIRS", "CASHIER"), subjectHandler.FindByClassID)
+		SubjectGroup.GET("/class/:class_id", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "STUDENT_AFFAIRS", "CASHIER"), subjectHandler.FindByClassID)
 		SubjectGroup.PUT("/update/:id", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "STUDENT_AFFAIRS"), subjectHandler.UpdateSubject)
 		SubjectGroup.DELETE("/delete/:id", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "STUDENT_AFFAIRS"), subjectHandler.DeleteSubject)
 	}

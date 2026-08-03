@@ -14,7 +14,7 @@ func RegIsterRouter(r *gin.Engine) {
 	FamilyHandler := handlers.RegisterFamilyHandler()
 	StudentHandler := handlers.RegisterStudentHandler()
 	studentClassHandler := handlers.RegisterStudentClassHandler()
-	teacherHandler := handlers.RegisterTeacherHandler()
+	employeeHandler := handlers.RegisterEmployeeHandler()
 	subjectHandler := handlers.RegisterSubjectHandler()
 	UserGroup := ApiGroup.Group("/users")
 	{
@@ -52,12 +52,11 @@ func RegIsterRouter(r *gin.Engine) {
 		StudentClassGroup.PUT("/deactivate/:student_id", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "STUDENT_AFFAIRS"), studentClassHandler.DeactivateStudentClass)
 	}
 
-	TeacherGroup := ApiGroup.Group("/teacher")
+	EmployeeGroup := ApiGroup.Group("/employee")
 	{
-		TeacherGroup.POST("/create", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "StudentAffairs"), teacherHandler.CreateTeacher)
-		TeacherGroup.PUT("/update/:id", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "StudentAffairs"), teacherHandler.UpdateTeacher)
-		TeacherGroup.GET("/all", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "StudentAffairs"), teacherHandler.GetAllTeachers)
-		TeacherGroup.GET("/phone/:phone", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "StudentAffairs"), teacherHandler.GetTeacherByPhone)
+		EmployeeGroup.POST("/create", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "HUMAN_RESOURCES"), employeeHandler.CreateEmployee)
+		EmployeeGroup.GET("/list", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "HUMAN_RESOURCES", "ACCOUNTANT"), employeeHandler.GetAllEmployees)
+		EmployeeGroup.PUT("/update/:id", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "HUMAN_RESOURCES"), employeeHandler.UpdateEmployee)
 	}
 	SubjectGroup := ApiGroup.Group("/subject")
 	{

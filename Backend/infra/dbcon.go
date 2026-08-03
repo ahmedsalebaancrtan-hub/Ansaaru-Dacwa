@@ -19,7 +19,23 @@ func DbConnect() {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	db.AutoMigrate(models.User{}, models.PasswordResetToken{}, models.Class{}, models.Family{}, models.Student{}, models.StudentClass{}, models.Employee{}, models.Subject{})
+	err = db.AutoMigrate(
+		&models.User{},
+		&models.PasswordResetToken{},
+		&models.Class{},
+		&models.Family{},
+		&models.Student{},
+		&models.StudentClass{},
+		&models.Employee{},
+		&models.Subject{},
+		&models.Attendance{}, // <-- Make sure pointers (&) are used
+	)
+
+	if err != nil {
+		fmt.Printf("❌ Migration Failed: %v\n", err)
+	} else {
+		fmt.Println("✅ Database Migrated Successfully!")
+	}
 
 	DB = db
 

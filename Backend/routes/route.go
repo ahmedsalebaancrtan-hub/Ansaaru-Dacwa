@@ -16,6 +16,8 @@ func RegIsterRouter(r *gin.Engine) {
 	studentClassHandler := handlers.RegisterStudentClassHandler()
 	employeeHandler := handlers.RegisterEmployeeHandler()
 	subjectHandler := handlers.RegisterSubjectHandler()
+	attendanceHandler := handlers.RegisterAttendanceHandler()
+
 	UserGroup := ApiGroup.Group("/users")
 	{
 		UserGroup.POST("/register", UserHandler.CreateUser)
@@ -65,5 +67,10 @@ func RegIsterRouter(r *gin.Engine) {
 		SubjectGroup.GET("/class/:class_id", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "STUDENT_AFFAIRS", "CASHIER"), subjectHandler.FindByClassID)
 		SubjectGroup.PUT("/update/:id", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "STUDENT_AFFAIRS"), subjectHandler.UpdateSubject)
 		SubjectGroup.DELETE("/delete/:id", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "STUDENT_AFFAIRS"), subjectHandler.DeleteSubject)
+	}
+	AttendanceGroup := ApiGroup.Group("/attendance")
+	{
+		AttendanceGroup.POST("/mark", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "TEACHER", "STUDENT_AFFAIRS"), attendanceHandler.MarkAttendance)
+		AttendanceGroup.GET("/class", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "TEACHER", "STUDENT_AFFAIRS"), attendanceHandler.GetClassAttendance)
 	}
 }

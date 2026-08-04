@@ -18,6 +18,7 @@ func RegIsterRouter(r *gin.Engine) {
 	subjectHandler := handlers.RegisterSubjectHandler()
 	attendanceHandler := handlers.RegisterAttendanceHandler()
 	paymentHandler := handlers.RegisterPaymentHandler()
+	examHandler := handlers.RegisterExamHandler()
 	UserGroup := ApiGroup.Group("/users")
 	{
 		UserGroup.POST("/register", UserHandler.CreateUser)
@@ -46,6 +47,7 @@ func RegIsterRouter(r *gin.Engine) {
 		StudentGroup.POST("/create", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "STUDENT_AFFAIRS"), StudentHandler.CreateStudent)
 		StudentGroup.GET("/list", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "STUDENT_AFFAIRS", "CASHIER"), StudentHandler.ListStudent)
 		StudentGroup.GET("/details/:id", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "STUDENT_AFFAIRS", "CASHIER"), StudentHandler.GetStudentByID)
+		StudentGroup.POST("/promote", middleware.Authenticated(), middleware.RequiredRole("ADMIN"), StudentHandler.PromoteStudents)
 	}
 	StudentClassGroup := ApiGroup.Group("/student_class")
 	{
@@ -77,5 +79,12 @@ func RegIsterRouter(r *gin.Engine) {
 	{
 		PaymentGroup.POST("/pay", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "CASHIER", "ACCOUNTANT"), paymentHandler.ProcessPayment)
 		PaymentGroup.GET("/student/:student_id", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "CASHIER", "ACCOUNTANT"), paymentHandler.GetStudentHistory)
+	}
+	ExamGroup := ApiGroup.Group("/exams")
+	{
+		ExamGroup.POST("/create", middleware.Authenticated(), middleware.RequiredRole("ADMIN"), examHandler.CreateExam)
+		ExamGroup.POST("/marks/submit", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "TEACHER"), examHandler.SubmitMarks)
+		ExamGroup.GET("/report-card/student/:student_id/exam/:exam_id", middleware.Authenticated(), examHandler.GetReportCard)
+		ExamGroup.POST("/marks/upload-excel", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "TEACHER"), examHandler.UploadMarksExcel)
 	}
 }

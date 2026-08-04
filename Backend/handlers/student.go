@@ -121,3 +121,25 @@ func (h *StudentHandler) GetStudentByID(c *gin.Context) {
 		"data":       student,
 	})
 }
+func (h *StudentHandler) PromoteStudents(c *gin.Context) {
+	var body dto.PromoteStudentsDTO
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"is_success": false,
+			"message":    "Xogta la soo diray ma saxna",
+			"error":      err.Error(),
+		})
+		return
+	}
+
+	status, err := h.StudentService.PromoteStudents(body)
+	if err != nil {
+		c.JSON(status, gin.H{"is_success": false, "message": err.Error()})
+		return
+	}
+
+	c.JSON(status, gin.H{
+		"is_success": true,
+		"message":    "Ardayda si guul leh ayaa loogu guuriyay fasalka cusub!",
+	})
+}

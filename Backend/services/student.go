@@ -84,3 +84,20 @@ func (svc *StudentService) GetStudentByID(id uint) (int, models.Student, error) 
 	}
 	return http.StatusOK, student, nil
 }
+func (svc *StudentService) PromoteStudents(data dto.PromoteStudentsDTO) (int, error) {
+	// 1. Hubi in fasalka cusub (ToClassID) uu dhab ahaan DB-ga ku jiro
+	var classCount int64
+	svc.classRepo.DB.Model(&models.Class{}).Where("id = ?", data.ToClassID).Count(&classCount)
+	if classCount == 0 {
+		return http.StatusNotFound, errors.New("fasalka loo guurinayo (target class) ma jiro")
+	}
+
+	// 2. Guuri ardayda
+	err := svc.StudentRepo.PromoteStudents(data.StudentIDs, data.ToClassID)
+	if err != nil {
+		slog.Error("❌ Failed to promote students", "error", err)
+		return http.StatusInternalServerError, errors.New("guurinta ardayda waa lagu dhibtooday")
+	}
+
+	return http.StatusOK, nil
+}

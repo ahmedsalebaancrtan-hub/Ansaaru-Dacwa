@@ -18,3 +18,8 @@ type UpdateStudentDto struct {
 	MobileNumber    string   `form:"mobile_number" json:"mobile_number"` // Optional
 	FamilyID        uint     `form:"family_id" json:"family_id" binding:"required"`
 }
+type PromoteStudentsDTO struct {
+	FromClassID uint   `json:"from_class_id" binding:"required"`
+	ToClassID   uint   `json:"to_class_id" binding:"required"`
+	StudentIDs  []uint `json:"student_ids" binding:"required,gt=0"` // List-ga ID-yada ardayda gudubtay
+}

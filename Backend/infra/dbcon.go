@@ -30,6 +30,7 @@ func DbConnect() {
 		&models.Subject{},
 		&models.Attendance{},
 		&models.StudentPayment{},
+		&models.Exam{},
 		// <-- Make sure pointers (&) are used
 	)
 

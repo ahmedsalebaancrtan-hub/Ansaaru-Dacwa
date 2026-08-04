@@ -43,3 +43,9 @@ func (r *StudentRepo) UpdateStudent(student models.Student) error {
 func (r *StudentRepo) DeleteStudent(id uint) error {
 	return r.DB.Delete(&models.Student{}, id).Error
 }
+
+func (r *StudentRepo) PromoteStudents(studentIDs []uint, toClassID uint) error {
+	return r.DB.Model(&models.Student{}).
+		Where("id IN ?", studentIDs).
+		Update("class_id", toClassID).Error
+}

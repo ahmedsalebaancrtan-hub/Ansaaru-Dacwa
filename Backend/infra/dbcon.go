@@ -28,7 +28,9 @@ func DbConnect() {
 		&models.StudentClass{},
 		&models.Employee{},
 		&models.Subject{},
-		&models.Attendance{}, // <-- Make sure pointers (&) are used
+		&models.Attendance{},
+		&models.StudentPayment{},
+		// <-- Make sure pointers (&) are used
 	)
 
 	if err != nil {

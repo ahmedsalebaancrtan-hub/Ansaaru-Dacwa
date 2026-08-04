@@ -19,6 +19,7 @@ func RegIsterRouter(r *gin.Engine) {
 	attendanceHandler := handlers.RegisterAttendanceHandler()
 	paymentHandler := handlers.RegisterPaymentHandler()
 	examHandler := handlers.RegisterExamHandler()
+	payrollHandler := handlers.RegisterPayrollHandler()
 	UserGroup := ApiGroup.Group("/users")
 	{
 		UserGroup.POST("/register", UserHandler.CreateUser)
@@ -86,5 +87,10 @@ func RegIsterRouter(r *gin.Engine) {
 		ExamGroup.POST("/marks/submit", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "TEACHER"), examHandler.SubmitMarks)
 		ExamGroup.GET("/report-card/student/:student_id/exam/:exam_id", middleware.Authenticated(), examHandler.GetReportCard)
 		ExamGroup.POST("/marks/upload-excel", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "TEACHER"), examHandler.UploadMarksExcel)
+	}
+	PayrollGroup := ApiGroup.Group("/payroll")
+	{
+		PayrollGroup.POST("/pay", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "ACCOUNTANT"), payrollHandler.PaySalary)
+		PayrollGroup.GET("/history", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "ACCOUNTANT"), payrollHandler.GetHistory)
 	}
 }

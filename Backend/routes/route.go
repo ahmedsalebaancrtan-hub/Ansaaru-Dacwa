@@ -75,11 +75,13 @@ func RegIsterRouter(r *gin.Engine) {
 	{
 		AttendanceGroup.POST("/mark", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "TEACHER", "STUDENT_AFFAIRS"), attendanceHandler.MarkAttendance)
 		AttendanceGroup.GET("/class", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "TEACHER", "STUDENT_AFFAIRS"), attendanceHandler.GetClassAttendance)
+		AttendanceGroup.POST("/send-absent-alerts", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "TEACHER", "STUDENT_AFFAIRS"), attendanceHandler.SendAbsentAlerts)
 	}
 	PaymentGroup := ApiGroup.Group("/payment")
 	{
 		PaymentGroup.POST("/pay", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "CASHIER", "ACCOUNTANT"), paymentHandler.ProcessPayment)
 		PaymentGroup.GET("/student/:student_id", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "CASHIER", "ACCOUNTANT"), paymentHandler.GetStudentHistory)
+		PaymentGroup.POST("/process-receipt", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "CASHIER", "ACCOUNTANT"), paymentHandler.ProcessPaymentAndSendReceipt)
 		PaymentGroup.POST("/send-reminders", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "ACCOUNTANT"), paymentHandler.SendReminders)
 	}
 	ExamGroup := ApiGroup.Group("/exams")

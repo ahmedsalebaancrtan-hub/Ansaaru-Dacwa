@@ -133,3 +133,56 @@ func (svc *PaymentService) SendUnpaidReminders(month string) (int, error) {
 
 	return count, nil
 }
+
+func (svc *PaymentService) ProcessPaymentAndSendReceipt(studentID uint, amount float64, monthFor string, method string) (string, error) {
+	// 1. Generate Receipt Number
+	receiptNo := fmt.Sprintf("REC-%d", time.Now().Unix())
+
+	// 2. Fetch Student & Family Info
+	type StudentDetails struct {
+		FullName       string
+		ParentOnePhone string
+	}
+	var details StudentDetails
+
+	err := svc.repo.DB.Raw(`
+		SELECT s.full_name, f.parent_one_phone 
+		FROM students s
+		JOIN families f ON s.family_id = f.id
+		WHERE s.id = ?
+	`, studentID).Scan(&details).Error
+
+	if err != nil {
+		return "", fmt.Errorf("student not found: %v", err)
+	}
+
+	// 3. Save to student_payments table
+	err = svc.repo.DB.Exec(`
+		INSERT INTO student_payments (receipt_no, student_id, amount_paid, month_for, payment_method, status, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, 'PAID', NOW(), NOW())
+	`, receiptNo, studentID, amount, monthFor, method).Error
+
+	if err != nil {
+		return "", fmt.Errorf("failed to save payment: %v", err)
+	}
+
+	// 4. Send WhatsApp Receipt Asynchronously
+	if strings.TrimSpace(details.ParentOnePhone) != "" {
+		go func() {
+			msg := fmt.Sprintf(
+				"🧾 *RISIDHKA LACAG BIXINTA*\n\n"+
+					"Asc Waalid, Waxaa nidaamka lagu diwaan-geliyay lacag bixintii Dugsiga Ansaaru Dacwa:\n\n"+
+					"👤 *Ardayga:* %s\n"+
+					"📅 *Bisha:* %s\n"+
+					"💵 *Lacagta:* $%.2f\n"+
+					"💳 *Qaabka:* %s\n"+
+					"🔢 *Risidh No:* %s\n\n"+
+					"Mahadsanid! Waxaan kuu reynaynaa horumar.",
+				details.FullName, monthFor, amount, method, receiptNo,
+			)
+			_ = helpers.SendWhatsAppMessage(details.ParentOnePhone, msg)
+		}()
+	}
+
+	return receiptNo, nil
+}

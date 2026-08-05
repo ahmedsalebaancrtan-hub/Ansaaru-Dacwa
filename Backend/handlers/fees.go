@@ -48,6 +48,40 @@ func (h *PaymentHandler) ProcessPayment(c *gin.Context) {
 	})
 }
 
+// 🟢 ProcessPaymentAndSendReceipt - Wuxuu diwaan-gelinayaa lacagta wuxuuna waalidka u dirayaa Risidh WhatsApp ah
+func (h *PaymentHandler) ProcessPaymentAndSendReceipt(c *gin.Context) {
+	var body dto.CreatePaymentDTO
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"is_success": false,
+			"message":    "Invalid payment receipt payload",
+			"error":      err.Error(),
+		})
+		return
+	}
+
+	receiptNo, err := h.svc.ProcessPaymentAndSendReceipt(
+		body.StudentID,
+		body.AmountPaid,
+		body.MonthFor,
+		body.PaymentMethod,
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"is_success": false,
+			"message":    err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"is_success": true,
+		"message":    "Lacag bixinta waa la diwaan-geliyay, risidhkiina waa loo diray waalidka!",
+		"receipt_no": receiptNo,
+	})
+}
+
 func (h *PaymentHandler) GetStudentHistory(c *gin.Context) {
 	idStr := c.Param("student_id")
 	studentID, err := strconv.Atoi(idStr)
@@ -67,6 +101,7 @@ func (h *PaymentHandler) GetStudentHistory(c *gin.Context) {
 		"data":       payments,
 	})
 }
+
 func (h *PaymentHandler) SendReminders(c *gin.Context) {
 	var body dto.UnpaidReminderDTO
 	if err := c.ShouldBindJSON(&body); err != nil {

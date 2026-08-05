@@ -74,3 +74,31 @@ func (h *AttendanceHandler) GetClassAttendance(c *gin.Context) {
 		"data":       records,
 	})
 }
+
+// 🟢 SendAbsentAlerts - Handler-kan wuxuu manual ahaan u dirayaa fariimaha maqnaanshaha
+func (h *AttendanceHandler) SendAbsentAlerts(c *gin.Context) {
+	var body dto.AbsentAlertDTO
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"is_success": false,
+			"message":    "Invalid request body",
+			"error":      err.Error(),
+		})
+		return
+	}
+
+	sentCount, err := h.svc.SendAbsentAlertsByDateAndClass(body.ClassID, body.Date)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"is_success": false,
+			"message":    err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"is_success": true,
+		"message":    "Fariimaha maqnaanshaha waxaa loo diray waalidiinta!",
+		"sent_count": sentCount,
+	})
+}

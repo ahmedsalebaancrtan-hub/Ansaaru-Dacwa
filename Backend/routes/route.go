@@ -80,6 +80,7 @@ func RegIsterRouter(r *gin.Engine) {
 	{
 		PaymentGroup.POST("/pay", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "CASHIER", "ACCOUNTANT"), paymentHandler.ProcessPayment)
 		PaymentGroup.GET("/student/:student_id", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "CASHIER", "ACCOUNTANT"), paymentHandler.GetStudentHistory)
+		PaymentGroup.POST("/send-reminders", middleware.Authenticated(), middleware.RequiredRole("ADMIN", "ACCOUNTANT"), paymentHandler.SendReminders)
 	}
 	ExamGroup := ApiGroup.Group("/exams")
 	{

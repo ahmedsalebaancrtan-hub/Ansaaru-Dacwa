@@ -7,3 +7,6 @@ type CreatePaymentDTO struct {
 	PaymentMethod string  `json:"payment_method" binding:"required"`
 	Note          string  `json:"note"`
 }
+type UnpaidReminderDTO struct {
+	Month string `json:"month" binding:"required"` // e.g. "2026-08"
+}

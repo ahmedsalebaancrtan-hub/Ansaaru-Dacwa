@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -64,5 +65,23 @@ func (h *PaymentHandler) GetStudentHistory(c *gin.Context) {
 	c.JSON(status, gin.H{
 		"is_success": true,
 		"data":       payments,
+	})
+}
+func (h *PaymentHandler) SendReminders(c *gin.Context) {
+	var body dto.UnpaidReminderDTO
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"is_success": false, "message": err.Error()})
+		return
+	}
+
+	sentCount, err := h.svc.SendUnpaidReminders(body.Month)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"is_success": false, "message": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"is_success": true,
+		"message":    fmt.Sprintf("Fariimaha xusuusinta waxaa loo diray %d waalid!", sentCount),
 	})
 }

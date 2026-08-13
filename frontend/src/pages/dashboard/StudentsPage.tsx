@@ -23,80 +23,47 @@ import {
   useStudents,
 } from "../../hooks/school/useStudents";
 
-<<<<<<< HEAD
 import { useClasses } from "../../hooks/school/useClasses";
 import { useFamilies } from "../../hooks/school/useFamilies";
-=======
-import { useFamilies } from "../../hooks/school/useFamilies";
-
-import type {
-  StudentGender,
-} from "../../types/Admin/student.types";
->>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
 
 interface StudentForm {
   fullName: string;
   studentCode: string;
-<<<<<<< HEAD
   classId: string;
   familyId: string;
   dateOfAdmission: string;
   discountFee: string;
   mobileNumber: string;
-=======
-  firstName: string;
-  middleName: string;
-  lastName: string;
-  gender: StudentGender | "";
-  familyId: string;
->>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
+  gender: string;
 }
 
 interface StudentErrors {
   fullName?: string;
   studentCode?: string;
-<<<<<<< HEAD
   classId?: string;
   familyId?: string;
   dateOfAdmission?: string;
   discountFee?: string;
   mobileNumber?: string;
-=======
-  firstName?: string;
-  middleName?: string;
-  lastName?: string;
   gender?: string;
-  familyId?: string;
->>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
 }
 
 const initialForm: StudentForm = {
   fullName: "",
   studentCode: "",
-<<<<<<< HEAD
   classId: "",
   familyId: "",
   dateOfAdmission: "",
   discountFee: "0",
   mobileNumber: "",
-=======
-  firstName: "",
-  middleName: "",
-  lastName: "",
   gender: "",
-  familyId: "",
->>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
 };
 
 function StudentsPage() {
   const studentsQuery = useStudents();
-<<<<<<< HEAD
   const classesQuery = useClasses();
   const familiesQuery = useFamilies();
 
-=======
-  const familiesQuery = useFamilies();
->>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
   const createStudentMutation =
     useCreateStudent();
 
@@ -112,9 +79,14 @@ function StudentsPage() {
   const [errors, setErrors] =
     useState<StudentErrors>({});
 
-  const students = studentsQuery.data ?? [];
-  const classes = classesQuery.data ?? [];
-  const families = familiesQuery.data ?? [];
+  const students =
+    studentsQuery.data ?? [];
+
+  const classes =
+    classesQuery.data ?? [];
+
+  const families =
+    familiesQuery.data ?? [];
 
   const filteredStudents = useMemo(() => {
     const value = search
@@ -128,15 +100,18 @@ function StudentsPage() {
     return students.filter((student) => {
       return (
         student.full_name
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(value) ||
         student.student_code
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(value) ||
         student.mobile_number
           ?.toLowerCase()
           .includes(value) ||
         student.class?.title
+          ?.toLowerCase()
+          .includes(value) ||
+        student.family?.familyName
           ?.toLowerCase()
           .includes(value)
       );
@@ -166,64 +141,74 @@ function StudentsPage() {
     setErrors({});
   };
 
-  const validateForm = (): StudentErrors => {
-    const newErrors: StudentErrors = {};
+  const validateForm =
+    (): StudentErrors => {
+      const newErrors: StudentErrors = {};
 
-    if (form.fullName.trim().length < 3) {
-      newErrors.fullName =
-        "Geli magaca ardayga";
-    }
+      if (
+        form.fullName.trim().length < 3
+      ) {
+        newErrors.fullName =
+          "Geli magaca ardayga";
+      }
 
-    if (form.studentCode.trim().length < 3) {
-      newErrors.studentCode =
-        "Geli student code";
-    }
+      if (
+        form.studentCode.trim().length < 3
+      ) {
+        newErrors.studentCode =
+          "Geli student code";
+      }
 
-    if (!form.classId) {
-      newErrors.classId =
-        "Dooro fasalka";
-    }
+      if (!form.classId) {
+        newErrors.classId =
+          "Dooro fasalka";
+      }
 
-    if (!form.familyId) {
-      newErrors.familyId =
-        "Dooro qoyska";
-    }
+      if (!form.familyId) {
+        newErrors.familyId =
+          "Dooro qoyska";
+      }
 
-    if (!form.dateOfAdmission) {
-      newErrors.dateOfAdmission =
-        "Dooro taariikhda";
-    }
+      if (!form.dateOfAdmission) {
+        newErrors.dateOfAdmission =
+          "Dooro taariikhda gelitaanka";
+      }
 
-    const discount = Number(
-      form.discountFee,
-    );
+      if (!form.gender) {
+        newErrors.gender =
+          "Dooro gender-ka";
+      }
 
-<<<<<<< HEAD
-    if (
-      Number.isNaN(discount) ||
-      discount < 0 ||
-      discount > 100
-    ) {
-      newErrors.discountFee =
-        "Discount-ku waa inuu noqdaa 0 ilaa 100";
-    }
+      const discount = Number(
+        form.discountFee,
+      );
 
-    if (
-      !/^\+?[0-9]{7,15}$/.test(
-        form.mobileNumber.replace(/\s+/g, ""),
-      )
-    ) {
-      newErrors.mobileNumber =
-        "Geli mobile sax ah";
-=======
-    if (!form.familyId) {
-      newErrors.familyId =
-        "Fadlan dooro qoyska";
->>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
-    }
+      if (
+        Number.isNaN(discount) ||
+        discount < 0 ||
+        discount > 100
+      ) {
+        newErrors.discountFee =
+          "Discount-ku waa inuu noqdaa 0 ilaa 100";
+      }
 
-    return newErrors;
-  };
+      const cleanPhone =
+        form.mobileNumber.replace(
+          /\s+/g,
+          "",
+        );
+
+      if (
+        !/^\+?[0-9]{7,15}$/.test(
+          cleanPhone,
+        )
+      ) {
+        newErrors.mobileNumber =
+          "Geli mobile sax ah";
+      }
+
+      return newErrors;
+    };
 
   const handleSubmit = (
     event: FormEvent<HTMLFormElement>,
@@ -234,7 +219,8 @@ function StudentsPage() {
       validateForm();
 
     if (
-      Object.keys(validationErrors).length > 0
+      Object.keys(validationErrors)
+        .length > 0
     ) {
       setErrors(validationErrors);
       return;
@@ -242,17 +228,22 @@ function StudentsPage() {
 
     createStudentMutation.mutate(
       {
-<<<<<<< HEAD
-        full_name: form.fullName.trim(),
+        full_name:
+          form.fullName.trim(),
+
         student_code:
           form.studentCode.trim(),
 
-        class_id: Number(form.classId),
+        class_id: Number(
+          form.classId,
+        ),
 
         date_of_admission:
           form.dateOfAdmission,
 
-        family_id: Number(form.familyId),
+        family_id: Number(
+          form.familyId,
+        ),
 
         discount_fee: Number(
           form.discountFee,
@@ -262,14 +253,8 @@ function StudentsPage() {
           form.mobileNumber
             .replace(/\s+/g, "")
             .trim(),
-=======
-        first_name: form.firstName.trim(),
-        middle_name: form.middleName.trim(),
-        last_name: form.lastName.trim(),
-        student_code: form.studentCode.trim(),
-        family_id: Number(form.familyId),
+
         gender: form.gender,
->>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
       },
       {
         onSuccess: () => {
@@ -301,7 +286,8 @@ function StudentsPage() {
           </h1>
 
           <p className="mt-0.5 text-[9px] text-slate-500">
-            Diiwaangeli oo maamul ardayda dugsiga.
+            Diiwaangeli oo maamul ardayda
+            dugsiga.
           </p>
         </div>
 
@@ -331,7 +317,9 @@ function StudentsPage() {
         <section className="rounded-xl border border-[#eadbd5] bg-white p-3 shadow-sm">
           <div className="mb-3 flex items-center gap-2">
             <div className="flex size-8 items-center justify-center rounded-lg bg-[#fff0eb] text-[#8b2408]">
-              <GraduationCap size={15} />
+              <GraduationCap
+                size={15}
+              />
             </div>
 
             <div>
@@ -366,7 +354,9 @@ function StudentsPage() {
                 }
                 placeholder="Mohamed Hassan Ali"
                 className={inputClass(
-                  Boolean(errors.fullName),
+                  Boolean(
+                    errors.fullName,
+                  ),
                 )}
               />
 
@@ -393,13 +383,55 @@ function StudentsPage() {
                 }
                 placeholder="STD-2026-001"
                 className={inputClass(
-                  Boolean(errors.studentCode),
+                  Boolean(
+                    errors.studentCode,
+                  ),
                 )}
               />
 
               {errors.studentCode && (
                 <p className="mt-0.5 text-[8px] text-red-600">
-                  {errors.studentCode}
+                  {
+                    errors.studentCode
+                  }
+                </p>
+              )}
+            </div>
+
+            {/* Gender */}
+            <div>
+              <label className="mb-0.5 block text-[9px] font-bold text-[#51433e]">
+                Gender
+              </label>
+
+              <select
+                value={form.gender}
+                onChange={(event) =>
+                  updateField(
+                    "gender",
+                    event.target.value,
+                  )
+                }
+                className={`${inputClass(
+                  Boolean(errors.gender),
+                )} appearance-none`}
+              >
+                <option value="">
+                  Dooro gender
+                </option>
+
+                <option value="male">
+                  Lab
+                </option>
+
+                <option value="female">
+                  Dhedig
+                </option>
+              </select>
+
+              {errors.gender && (
+                <p className="mt-0.5 text-[8px] text-red-600">
+                  {errors.gender}
                 </p>
               )}
             </div>
@@ -418,6 +450,9 @@ function StudentsPage() {
 
                 <select
                   value={form.classId}
+                  disabled={
+                    classesQuery.isLoading
+                  }
                   onChange={(event) =>
                     updateField(
                       "classId",
@@ -425,20 +460,31 @@ function StudentsPage() {
                     )
                   }
                   className={`${inputClass(
-                    Boolean(errors.classId),
-                  )} appearance-none pl-8`}
+                    Boolean(
+                      errors.classId,
+                    ),
+                  )} appearance-none pl-8 disabled:cursor-not-allowed disabled:opacity-60`}
                 >
                   <option value="">
-                    Dooro fasalka
+                    {classesQuery.isLoading
+                      ? "Fasallada waa la soo qaadayaa..."
+                      : "Dooro fasalka"}
                   </option>
 
                   {classes.map(
                     (schoolClass) => (
                       <option
-                        key={schoolClass.id}
-                        value={schoolClass.id}
+                        key={
+                          schoolClass.id
+                        }
+                        value={
+                          schoolClass.id
+                        }
                       >
-                        {schoolClass.title} -{" "}
+                        {
+                          schoolClass.title
+                        }{" "}
+                        -{" "}
                         {
                           schoolClass.AcademicYear
                         }
@@ -457,125 +503,7 @@ function StudentsPage() {
 
             {/* Family */}
             <div>
-<<<<<<< HEAD
               <label className="mb-0.5 block text-[9px] font-bold text-[#51433e]">
-=======
-              <label
-                htmlFor="middle-name"
-                className="mb-2 block text-sm font-bold text-[#51433e]"
-              >
-                Magaca Dhexe
-              </label>
-
-              <input
-                id="middle-name"
-                value={form.middleName}
-                onChange={(event) =>
-                  updateField(
-                    "middleName",
-                    event.target.value,
-                  )
-                }
-                placeholder="Saleban"
-                className={`h-12 w-full rounded-xl border bg-[#fff8f5] px-4 outline-none transition focus:bg-white focus:ring-4 ${
-                  errors.middleName
-                    ? "border-red-400 focus:ring-red-100"
-                    : "border-[#dfcbc4] focus:border-[#8b2408] focus:ring-orange-100"
-                }`}
-              />
-
-              {errors.middleName && (
-                <p className="mt-2 text-sm text-red-600">
-                  {errors.middleName}
-                </p>
-              )}
-            </div>
-
-            {/* Last name */}
-            <div>
-              <label
-                htmlFor="last-name"
-                className="mb-2 block text-sm font-bold text-[#51433e]"
-              >
-                Magaca Dambe
-              </label>
-
-              <input
-                id="last-name"
-                value={form.lastName}
-                onChange={(event) =>
-                  updateField(
-                    "lastName",
-                    event.target.value,
-                  )
-                }
-                placeholder="Cartan"
-                className={`h-12 w-full rounded-xl border bg-[#fff8f5] px-4 outline-none transition focus:bg-white focus:ring-4 ${
-                  errors.lastName
-                    ? "border-red-400 focus:ring-red-100"
-                    : "border-[#dfcbc4] focus:border-[#8b2408] focus:ring-orange-100"
-                }`}
-              />
-
-              {errors.lastName && (
-                <p className="mt-2 text-sm text-red-600">
-                  {errors.lastName}
-                </p>
-              )}
-            </div>
-
-            {/* Gender */}
-            <div>
-              <label
-                htmlFor="gender"
-                className="mb-2 block text-sm font-bold text-[#51433e]"
-              >
-                Gender
-              </label>
-
-              <select
-                id="gender"
-                value={form.gender}
-                onChange={(event) =>
-                  updateField(
-                    "gender",
-                    event.target
-                      .value as StudentGender | "",
-                  )
-                }
-                className={`h-12 w-full rounded-xl border bg-[#fff8f5] px-4 outline-none transition focus:bg-white focus:ring-4 ${
-                  errors.gender
-                    ? "border-red-400 focus:ring-red-100"
-                    : "border-[#dfcbc4] focus:border-[#8b2408] focus:ring-orange-100"
-                }`}
-              >
-                <option value="">
-                  Dooro gender
-                </option>
-
-                <option value="male">
-                  Lab
-                </option>
-
-                <option value="female">
-                  Dhedig
-                </option>
-              </select>
-
-              {errors.gender && (
-                <p className="mt-2 text-sm text-red-600">
-                  {errors.gender}
-                </p>
-              )}
-            </div>
-
-            {/* Family selection */}
-            <div>
-              <label
-                htmlFor="family-id"
-                className="mb-2 block text-sm font-bold text-[#51433e]"
-              >
->>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
                 Qoyska
               </label>
 
@@ -586,35 +514,21 @@ function StudentsPage() {
                 />
 
                 <select
-<<<<<<< HEAD
                   value={form.familyId}
-=======
-                  id="family-id"
-                  value={form.familyId}
-                  disabled={familiesQuery.isLoading}
->>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
+                  disabled={
+                    familiesQuery.isLoading
+                  }
                   onChange={(event) =>
                     updateField(
                       "familyId",
                       event.target.value,
                     )
                   }
-<<<<<<< HEAD
                   className={`${inputClass(
-                    Boolean(errors.familyId),
-                  )} appearance-none pl-8`}
-                >
-                  <option value="">
-                    Dooro qoyska
-                  </option>
-
-                  {families.map((family) => (
-=======
-                  className={`h-12 w-full appearance-none rounded-xl border bg-[#fff8f5] pl-12 pr-4 outline-none transition focus:bg-white focus:ring-4 disabled:cursor-not-allowed disabled:opacity-60 ${
-                    errors.familyId
-                      ? "border-red-400 focus:ring-red-100"
-                      : "border-[#dfcbc4] focus:border-[#8b2408] focus:ring-orange-100"
-                  }`}
+                    Boolean(
+                      errors.familyId,
+                    ),
+                  )} appearance-none pl-8 disabled:cursor-not-allowed disabled:opacity-60`}
                 >
                   <option value="">
                     {familiesQuery.isLoading
@@ -622,24 +536,25 @@ function StudentsPage() {
                       : "Dooro qoyska"}
                   </option>
 
-                  {(familiesQuery.data ?? []).map((family) => (
->>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
-                    <option
-                      key={family.id}
-                      value={family.id}
-                    >
-<<<<<<< HEAD
-                      {family.familyName}
-=======
-                      {family.familyName} — {family.Parent_one_Name}
->>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
-                    </option>
-                  ))}
+                  {families.map(
+                    (family) => (
+                      <option
+                        key={family.id}
+                        value={family.id}
+                      >
+                        {
+                          family.familyName
+                        }
+                        {family.Parent_one_Name
+                          ? ` - ${family.Parent_one_Name}`
+                          : ""}
+                      </option>
+                    ),
+                  )}
                 </select>
               </div>
 
               {errors.familyId && (
-<<<<<<< HEAD
                 <p className="mt-0.5 text-[8px] text-red-600">
                   {errors.familyId}
                 </p>
@@ -679,7 +594,9 @@ function StudentsPage() {
 
               {errors.dateOfAdmission && (
                 <p className="mt-0.5 text-[8px] text-red-600">
-                  {errors.dateOfAdmission}
+                  {
+                    errors.dateOfAdmission
+                  }
                 </p>
               )}
             </div>
@@ -700,7 +617,9 @@ function StudentsPage() {
                   type="number"
                   min="0"
                   max="100"
-                  value={form.discountFee}
+                  value={
+                    form.discountFee
+                  }
                   onChange={(event) =>
                     updateField(
                       "discountFee",
@@ -708,14 +627,18 @@ function StudentsPage() {
                     )
                   }
                   className={`${inputClass(
-                    Boolean(errors.discountFee),
+                    Boolean(
+                      errors.discountFee,
+                    ),
                   )} pl-8`}
                 />
               </div>
 
               {errors.discountFee && (
                 <p className="mt-0.5 text-[8px] text-red-600">
-                  {errors.discountFee}
+                  {
+                    errors.discountFee
+                  }
                 </p>
               )}
             </div>
@@ -734,7 +657,9 @@ function StudentsPage() {
 
                 <input
                   type="tel"
-                  value={form.mobileNumber}
+                  value={
+                    form.mobileNumber
+                  }
                   onChange={(event) =>
                     updateField(
                       "mobileNumber",
@@ -752,17 +677,15 @@ function StudentsPage() {
 
               {errors.mobileNumber && (
                 <p className="mt-0.5 text-[8px] text-red-600">
-                  {errors.mobileNumber}
-=======
-                <p className="mt-2 text-sm text-red-600">
-                  {errors.familyId}
->>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
+                  {
+                    errors.mobileNumber
+                  }
                 </p>
               )}
             </div>
 
             {/* Actions */}
-            <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-2">
+            <div className="flex items-end gap-2 sm:col-span-2">
               <button
                 type="button"
                 onClick={closeForm}
@@ -787,7 +710,9 @@ function StudentsPage() {
                   <Plus size={13} />
                 )}
 
-                Kaydi Ardayga
+                {createStudentMutation.isPending
+                  ? "Waa la kaydinayaa..."
+                  : "Kaydi Ardayga"}
               </button>
             </div>
           </form>
@@ -795,7 +720,7 @@ function StudentsPage() {
       )}
 
       {/* Student list */}
-      <section className="rounded-xl border border-[#eadbd5] bg-white shadow-sm">
+      <section className="overflow-hidden rounded-xl border border-[#eadbd5] bg-white shadow-sm">
         <div className="flex items-center justify-between gap-3 border-b border-[#eee1dc] p-3">
           <div>
             <h2 className="text-[11px] font-black text-[#30201a]">
@@ -811,7 +736,7 @@ function StudentsPage() {
             <div className="relative">
               <Search
                 size={12}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
+                className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
               />
 
               <input
@@ -832,6 +757,7 @@ function StudentsPage() {
                 studentsQuery.refetch()
               }
               className="flex size-8 items-center justify-center rounded-lg border border-[#dfcbc4] text-[#8b2408]"
+              aria-label="Refresh students"
             >
               <RefreshCw
                 size={12}
@@ -852,7 +778,8 @@ function StudentsPage() {
               className="animate-spin text-[#8b2408]"
             />
           </div>
-        ) : filteredStudents.length === 0 ? (
+        ) : filteredStudents.length ===
+          0 ? (
           <div className="flex h-32 items-center justify-center">
             <p className="text-[9px] text-slate-500">
               Arday lama helin.
@@ -864,7 +791,7 @@ function StudentsPage() {
               (student) => (
                 <div
                   key={student.id}
-                  className="grid items-center gap-2 px-3 py-2 hover:bg-[#fffaf8] sm:grid-cols-[1.4fr_1fr_1fr_1fr]"
+                  className="grid items-center gap-2 px-3 py-2 transition hover:bg-[#fffaf8] sm:grid-cols-[1.4fr_1fr_1fr_1fr]"
                 >
                   <div className="flex min-w-0 items-center gap-2">
                     <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-[#fff0eb] text-[#8b2408]">
@@ -875,11 +802,15 @@ function StudentsPage() {
 
                     <div className="min-w-0">
                       <p className="truncate text-[10px] font-black text-[#30201a]">
-                        {student.full_name}
+                        {
+                          student.full_name
+                        }
                       </p>
 
                       <p className="text-[8px] text-slate-400">
-                        {student.student_code}
+                        {
+                          student.student_code
+                        }
                       </p>
                     </div>
                   </div>
@@ -890,8 +821,8 @@ function StudentsPage() {
                     </p>
 
                     <p className="text-[9px] font-bold text-[#51433e]">
-                      {student.class?.title ??
-                        "—"}
+                      {student.class
+                        ?.title ?? "—"}
                     </p>
                   </div>
 
@@ -912,7 +843,9 @@ function StudentsPage() {
                     </p>
 
                     <p className="text-[9px] font-black text-[#8b2408]">
-                      {student.discount_fee ?? 0}%
+                      {student.discount_fee ??
+                        0}
+                      %
                     </p>
                   </div>
                 </div>

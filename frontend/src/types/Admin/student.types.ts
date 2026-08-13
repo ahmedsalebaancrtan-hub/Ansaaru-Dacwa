@@ -16,6 +16,8 @@ export interface Student {
   family_id: number;
   family?: Family;
 
+  gender?: string;
+
   created_at: string;
   updated_at: string;
 }
@@ -23,15 +25,14 @@ export interface Student {
 export interface CreateStudentRequest {
   full_name: string;
   student_code: string;
-<<<<<<< HEAD
+
   class_id: number;
   date_of_admission: string;
   family_id: number;
   discount_fee: number;
   mobile_number: string;
-  family_id: number;
-  gender: StudentGender;
 
+  gender: string;
 }
 
 export interface StudentsResponse {

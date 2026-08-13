@@ -18,7 +18,7 @@ import {
 import {
   Link,
   useNavigate,
-} from "react-router";
+} from "react-router-dom";
 
 import { useCreateUser } from "../../hooks/auth/useAuthMutations";
 
@@ -85,7 +85,7 @@ function CreateUserPage() {
 
     if (form.fullname.trim().length < 3) {
       newErrors.fullname =
-        "Full name must be at least 3 characters";
+        "Magacu waa inuu ugu yaraan yahay 3 xaraf";
     }
 
     if (
@@ -94,19 +94,19 @@ function CreateUserPage() {
       )
     ) {
       newErrors.emailaddress =
-        "Enter a valid email address";
+        "Geli email sax ah";
     }
 
     if (form.password.length < 8) {
       newErrors.password =
-        "Password must be at least 8 characters";
+        "Password-ku waa inuu ugu yaraan yahay 8 xaraf";
     }
 
     if (
       form.confirmPassword !== form.password
     ) {
       newErrors.confirmPassword =
-        "Passwords do not match";
+        "Labada password isku mid ma aha";
     }
 
     return newErrors;
@@ -117,7 +117,8 @@ function CreateUserPage() {
   ) => {
     event.preventDefault();
 
-    const validationErrors = validateForm();
+    const validationErrors =
+      validateForm();
 
     if (
       Object.keys(validationErrors).length > 0
@@ -128,7 +129,8 @@ function CreateUserPage() {
 
     const request: CreateUserRequest = {
       fullname: form.fullname.trim(),
-      emailaddress: form.emailaddress.trim(),
+      emailaddress:
+        form.emailaddress.trim(),
       password: form.password,
       role: form.role,
     };
@@ -141,278 +143,374 @@ function CreateUserPage() {
     });
   };
 
+  const inputClass = (
+    hasError: boolean,
+  ) =>
+    [
+      "h-9 w-full rounded-lg border bg-[#fffaf0]",
+      "text-[11px] text-[#2d211d] outline-none transition",
+      "placeholder:text-[#a7958e]",
+      "focus:bg-white focus:ring-2",
+      hasError
+        ? "border-red-400 focus:border-red-500 focus:ring-red-100"
+        : "border-[#dfcbc4] focus:border-[#8b2408] focus:ring-orange-100",
+    ].join(" ");
+
   return (
-    <main className="min-h-dvh bg-[#fff8f5] px-4 py-6 sm:px-8 lg:px-12">
-      <div className="mx-auto max-w-5xl">
-        <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <div>
+    <div className="h-[calc(100dvh-8rem)] overflow-hidden bg-[#fff8f5] md:h-[calc(100dvh-6rem)]">
+      <div className="mx-auto flex h-full max-w-4xl flex-col">
+        {/* Page heading */}
+        <header className="mb-3 flex shrink-0 items-center justify-between gap-3">
+          <div className="min-w-0">
             <Link
               to="/dashboard"
-              className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-[#7c2a13] hover:underline"
+              className="mb-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-[#7c2a13] transition hover:underline"
             >
-              <ArrowLeft size={17} />
+              <ArrowLeft size={13} />
               Dashboard
             </Link>
 
-            <h1 className="text-2xl font-bold text-[#271814] sm:text-3xl">
+            <h1 className="text-lg font-black text-[#271814] sm:text-xl">
               Samee Akoon Cusub
             </h1>
 
-            <p className="mt-2 text-sm text-slate-500 sm:text-base">
-              Samee akoon shaqaale cusub oo geli
-              doorka uu nidaamka ku leeyahay.
+            <p className="mt-0.5 text-[10px] text-slate-500">
+              Samee akoon shaqaale cusub oo
+              door u qoondee.
             </p>
           </div>
 
-          <div className="flex size-12 items-center justify-center rounded-xl bg-[#8b2408] text-white">
-            <UserPlus size={25} />
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#8b2408] text-white shadow-sm">
+            <UserPlus size={18} />
           </div>
         </header>
 
-        <section className="overflow-hidden rounded-2xl border border-[#ead8d0] bg-white shadow-sm">
-          <div className="border-b border-[#eee1dc] bg-[#fff4f0] px-5 py-4 sm:px-8">
-            <div className="flex items-center gap-3">
+        {/* Form card */}
+        <section className="min-h-0 flex-1 overflow-hidden rounded-xl border border-[#ead8d0] bg-white shadow-sm">
+          <div className="flex h-full flex-col">
+            {/* Card heading */}
+            <div className="flex shrink-0 items-center gap-2 border-b border-[#eee1dc] bg-[#fff4f0] px-4 py-2.5">
               <ShieldCheck
-                size={21}
+                size={16}
                 className="text-[#8b2408]"
               />
 
-              <p className="font-semibold text-[#432219]">
+              <p className="text-[11px] font-black text-[#432219]">
                 Macluumaadka Akoonka
               </p>
             </div>
-          </div>
 
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-6 p-5 sm:p-8"
-            noValidate
-          >
-            <div className="grid gap-6 md:grid-cols-2">
-              <div>
-                <label
-                  htmlFor="fullname"
-                  className="mb-2 block text-sm font-semibold text-[#51433e]"
-                >
-                  Magaca Buuxa
-                </label>
+            <form
+              onSubmit={handleSubmit}
+              className="flex min-h-0 flex-1 flex-col justify-between p-4"
+              noValidate
+            >
+              <div className="space-y-3">
+                {/* Name and email */}
+                <div className="grid gap-3 md:grid-cols-2">
+                  <div>
+                    <label
+                      htmlFor="fullname"
+                      className="mb-1 block text-[10px] font-bold text-[#51433e]"
+                    >
+                      Magaca Buuxa
+                    </label>
 
-                <div className="relative">
-                  <UserRound
-                    size={20}
-                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#99847c]"
-                  />
+                    <div className="relative">
+                      <UserRound
+                        size={15}
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#99847c]"
+                      />
 
-                  <input
-                    id="fullname"
-                    value={form.fullname}
-                    onChange={(event) =>
-                      updateField(
-                        "fullname",
-                        event.target.value,
-                      )
-                    }
-                    placeholder="Geli magaca oo saddexan"
-                    className="h-14 w-full rounded-xl border border-[#dfcbc4] bg-[#fffaf0] pl-12 pr-4 outline-none transition focus:border-[#8b2408] focus:bg-white focus:ring-4 focus:ring-orange-100"
-                  />
-                </div>
+                      <input
+                        id="fullname"
+                        name="fullname"
+                        type="text"
+                        value={form.fullname}
+                        onChange={(event) =>
+                          updateField(
+                            "fullname",
+                            event.target.value,
+                          )
+                        }
+                        placeholder="Geli magaca oo buuxa"
+                        autoComplete="name"
+                        aria-invalid={Boolean(
+                          errors.fullname,
+                        )}
+                        className={`${inputClass(
+                          Boolean(errors.fullname),
+                        )} pl-9 pr-3`}
+                      />
+                    </div>
 
-                {errors.fullname && (
-                  <p className="mt-2 text-sm text-red-600">
-                    {errors.fullname}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="user-email"
-                  className="mb-2 block text-sm font-semibold text-[#51433e]"
-                >
-                  Email-ka Rasmiga ah
-                </label>
-
-                <div className="relative">
-                  <Mail
-                    size={20}
-                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#99847c]"
-                  />
-
-                  <input
-                    id="user-email"
-                    type="email"
-                    value={form.emailaddress}
-                    onChange={(event) =>
-                      updateField(
-                        "emailaddress",
-                        event.target.value,
-                      )
-                    }
-                    placeholder="user@example.com"
-                    className="h-14 w-full rounded-xl border border-[#dfcbc4] bg-[#fffaf0] pl-12 pr-4 outline-none transition focus:border-[#8b2408] focus:bg-white focus:ring-4 focus:ring-orange-100"
-                  />
-                </div>
-
-                {errors.emailaddress && (
-                  <p className="mt-2 text-sm text-red-600">
-                    {errors.emailaddress}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="role"
-                className="mb-2 block text-sm font-semibold text-[#51433e]"
-              >
-                Doorka Shaqada
-              </label>
-
-              <select
-                id="role"
-                value={form.role}
-                onChange={(event) =>
-                  updateField(
-                    "role",
-                    event.target.value as UserRole,
-                  )
-                }
-                className="h-14 w-full rounded-xl border border-[#dfcbc4] bg-[#fffaf0] px-4 outline-none transition focus:border-[#8b2408] focus:bg-white focus:ring-4 focus:ring-orange-100"
-              >
-                <option value="ADMIN">
-                  Maamulaha Guud
-                </option>
-
-                <option value="STUDENT_AFFAIRS">
-                  Arrimaha Ardayda
-                </option>
-
-                <option value="CASHIER">
-                  Qasnaji
-                </option>
-              </select>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              <div>
-                <label
-                  htmlFor="create-password"
-                  className="mb-2 block text-sm font-semibold text-[#51433e]"
-                >
-                  Furaha Sirta ah
-                </label>
-
-                <div className="relative">
-                  <LockKeyhole
-                    size={20}
-                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#99847c]"
-                  />
-
-                  <input
-                    id="create-password"
-                    type={
-                      showPassword
-                        ? "text"
-                        : "password"
-                    }
-                    value={form.password}
-                    onChange={(event) =>
-                      updateField(
-                        "password",
-                        event.target.value,
-                      )
-                    }
-                    className="h-14 w-full rounded-xl border border-[#dfcbc4] bg-[#fffaf0] pl-12 pr-12 outline-none transition focus:border-[#8b2408] focus:bg-white focus:ring-4 focus:ring-orange-100"
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setShowPassword(
-                        (current) => !current,
-                      )
-                    }
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#88736c]"
-                  >
-                    {showPassword ? (
-                      <EyeOff size={20} />
-                    ) : (
-                      <Eye size={20} />
+                    {errors.fullname && (
+                      <p className="mt-0.5 text-[9px] font-medium text-red-600">
+                        {errors.fullname}
+                      </p>
                     )}
-                  </button>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="user-email"
+                      className="mb-1 block text-[10px] font-bold text-[#51433e]"
+                    >
+                      Email-ka Rasmiga ah
+                    </label>
+
+                    <div className="relative">
+                      <Mail
+                        size={15}
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#99847c]"
+                      />
+
+                      <input
+                        id="user-email"
+                        name="emailaddress"
+                        type="email"
+                        value={form.emailaddress}
+                        onChange={(event) =>
+                          updateField(
+                            "emailaddress",
+                            event.target.value,
+                          )
+                        }
+                        placeholder="user@example.com"
+                        autoComplete="email"
+                        aria-invalid={Boolean(
+                          errors.emailaddress,
+                        )}
+                        className={`${inputClass(
+                          Boolean(
+                            errors.emailaddress,
+                          ),
+                        )} pl-9 pr-3`}
+                      />
+                    </div>
+
+                    {errors.emailaddress && (
+                      <p className="mt-0.5 text-[9px] font-medium text-red-600">
+                        {errors.emailaddress}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                {errors.password && (
-                  <p className="mt-2 text-sm text-red-600">
-                    {errors.password}
-                  </p>
-                )}
+                {/* Role */}
+                <div>
+                  <label
+                    htmlFor="role"
+                    className="mb-1 block text-[10px] font-bold text-[#51433e]"
+                  >
+                    Doorka Shaqada
+                  </label>
+
+                  <select
+                    id="role"
+                    name="role"
+                    value={form.role}
+                    onChange={(event) =>
+                      updateField(
+                        "role",
+                        event.target
+                          .value as UserRole,
+                      )
+                    }
+                    className={`${inputClass(
+                      false,
+                    )} appearance-none px-3`}
+                  >
+                    <option value="ADMIN">
+                      Maamulaha Guud
+                    </option>
+
+                    <option value="STUDENT_AFFAIRS">
+                      Arrimaha Ardayda
+                    </option>
+
+                    <option value="CASHIER">
+                      Qasnaji
+                    </option>
+                  </select>
+                </div>
+
+                {/* Passwords */}
+                <div className="grid gap-3 md:grid-cols-2">
+                  <div>
+                    <label
+                      htmlFor="create-password"
+                      className="mb-1 block text-[10px] font-bold text-[#51433e]"
+                    >
+                      Furaha Sirta ah
+                    </label>
+
+                    <div className="relative">
+                      <LockKeyhole
+                        size={15}
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#99847c]"
+                      />
+
+                      <input
+                        id="create-password"
+                        name="password"
+                        type={
+                          showPassword
+                            ? "text"
+                            : "password"
+                        }
+                        value={form.password}
+                        onChange={(event) =>
+                          updateField(
+                            "password",
+                            event.target.value,
+                          )
+                        }
+                        placeholder="Ugu yaraan 8 xaraf"
+                        autoComplete="new-password"
+                        aria-invalid={Boolean(
+                          errors.password,
+                        )}
+                        className={`${inputClass(
+                          Boolean(errors.password),
+                        )} pl-9 pr-9`}
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowPassword(
+                            (currentValue) =>
+                              !currentValue,
+                          )
+                        }
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#88736c] transition hover:text-[#6d210d]"
+                        aria-label={
+                          showPassword
+                            ? "Qari furaha"
+                            : "Muuji furaha"
+                        }
+                      >
+                        {showPassword ? (
+                          <EyeOff size={15} />
+                        ) : (
+                          <Eye size={15} />
+                        )}
+                      </button>
+                    </div>
+
+                    {errors.password && (
+                      <p className="mt-0.5 text-[9px] font-medium text-red-600">
+                        {errors.password}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="confirm-create-password"
+                      className="mb-1 block text-[10px] font-bold text-[#51433e]"
+                    >
+                      Hubi Furaha
+                    </label>
+
+                    <div className="relative">
+                      <LockKeyhole
+                        size={15}
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#99847c]"
+                      />
+
+                      <input
+                        id="confirm-create-password"
+                        name="confirmPassword"
+                        type={
+                          showPassword
+                            ? "text"
+                            : "password"
+                        }
+                        value={form.confirmPassword}
+                        onChange={(event) =>
+                          updateField(
+                            "confirmPassword",
+                            event.target.value,
+                          )
+                        }
+                        placeholder="Ku celi furaha"
+                        autoComplete="new-password"
+                        aria-invalid={Boolean(
+                          errors.confirmPassword,
+                        )}
+                        className={`${inputClass(
+                          Boolean(
+                            errors.confirmPassword,
+                          ),
+                        )} pl-9 pr-3`}
+                      />
+                    </div>
+
+                    {errors.confirmPassword && (
+                      <p className="mt-0.5 text-[9px] font-medium text-red-600">
+                        {errors.confirmPassword}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Account information */}
+                <div className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-2">
+                  <div className="flex items-start gap-2">
+                    <ShieldCheck
+                      size={14}
+                      className="mt-0.5 shrink-0 text-blue-700"
+                    />
+
+                    <p className="text-[9px] leading-4 text-blue-700">
+                      Isticmaaluhu wuxuu nidaamka ku
+                      geli doonaa email-ka iyo
+                      password-ka aad u samayso.
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <label
-                  htmlFor="confirm-create-password"
-                  className="mb-2 block text-sm font-semibold text-[#51433e]"
+              {/* Actions */}
+              <div className="mt-3 flex shrink-0 flex-col-reverse gap-2 border-t border-[#eee1dc] pt-3 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate("/dashboard")
+                  }
+                  className="h-9 rounded-lg border border-[#d9c6be] px-4 text-[10px] font-bold text-[#5c453d] transition hover:bg-[#fff4f0]"
                 >
-                  Hubi Furaha Sirta ah
-                </label>
+                  Ka Noqo
+                </button>
 
-                <input
-                  id="confirm-create-password"
-                  type={
-                    showPassword
-                      ? "text"
-                      : "password"
+                <button
+                  type="submit"
+                  disabled={
+                    createUserMutation.isPending
                   }
-                  value={form.confirmPassword}
-                  onChange={(event) =>
-                    updateField(
-                      "confirmPassword",
-                      event.target.value,
-                    )
-                  }
-                  className="h-14 w-full rounded-xl border border-[#dfcbc4] bg-[#fffaf0] px-4 outline-none transition focus:border-[#8b2408] focus:bg-white focus:ring-4 focus:ring-orange-100"
-                />
+                  className="flex h-9 items-center justify-center gap-1.5 rounded-lg bg-[#8b2408] px-5 text-[10px] font-black text-white transition hover:bg-[#701b05] focus:outline-none focus:ring-2 focus:ring-orange-200 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {createUserMutation.isPending ? (
+                    <LoaderCircle
+                      size={15}
+                      className="animate-spin"
+                    />
+                  ) : (
+                    <UserPlus size={15} />
+                  )}
 
-                {errors.confirmPassword && (
-                  <p className="mt-2 text-sm text-red-600">
-                    {errors.confirmPassword}
-                  </p>
-                )}
+                  {createUserMutation.isPending
+                    ? "Waa la samaynayaa..."
+                    : "Diiwaangeli Akoonka"}
+                </button>
               </div>
-            </div>
-
-            <div className="flex flex-col-reverse gap-3 border-t border-[#eee1dc] pt-6 sm:flex-row sm:justify-end">
-              <button
-                type="button"
-                onClick={() => navigate("/dashboard")}
-                className="h-12 rounded-xl border border-[#d9c6be] px-6 font-semibold text-[#5c453d] transition hover:bg-[#fff4f0]"
-              >
-                Ka Noqo
-              </button>
-
-              <button
-                type="submit"
-                disabled={createUserMutation.isPending}
-                className="flex h-12 items-center justify-center gap-2 rounded-xl bg-[#8b2408] px-7 font-bold text-white transition hover:bg-[#701b05] focus:ring-4 focus:ring-orange-200 disabled:opacity-60"
-              >
-                {createUserMutation.isPending ? (
-                  <LoaderCircle
-                    size={20}
-                    className="animate-spin"
-                  />
-                ) : (
-                  <UserPlus size={20} />
-                )}
-
-                Diiwaangeli Akoonka
-              </button>
-            </div>
-          </form>
+            </form>
+          </div>
         </section>
       </div>
-    </main>
+    </div>
   );
 }
 

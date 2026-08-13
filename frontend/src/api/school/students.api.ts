@@ -2,44 +2,23 @@ import { api } from "../axiosInstance";
 
 import type {
   CreateStudentRequest,
+  CreateStudentResponse,
   Student,
-  StudentApiResponse,
-  StudentsApiResponse,
+  StudentsResponse,
 } from "../../types/Admin/student.types";
 
-// Ku beddel route-ka saxda ah haddii backend-ku ka duwan yahay.
 const STUDENT_ENDPOINT = "/api/v1/students";
-
-function getResponseMessage(
-  response: {
-    message?: string;
-    messege?: string;
-  },
-  fallbackMessage: string,
-): string {
-  return (
-    response.message ??
-    response.messege ??
-    fallbackMessage
-  );
-}
 
 export async function getStudents(): Promise<Student[]> {
   const { data: response } =
-    await api.get<StudentsApiResponse>(
+    await api.get<StudentsResponse>(
       STUDENT_ENDPOINT,
     );
 
-  const requestWasSuccessful =
-    response.is_sucess !== false &&
-    response.is_success !== false;
-
-  if (!requestWasSuccessful) {
+  if (!response.is_success) {
     throw new Error(
-      getResponseMessage(
-        response,
-        "Ardayda lama soo heli karin",
-      ),
+      response.message ??
+        "Ardayda lama soo heli karo",
     );
   }
 
@@ -50,21 +29,15 @@ export async function createStudent(
   request: CreateStudentRequest,
 ): Promise<Student | null> {
   const { data: response } =
-    await api.post<StudentApiResponse>(
+    await api.post<CreateStudentResponse>(
       STUDENT_ENDPOINT,
       request,
     );
 
-  const requestWasSuccessful =
-    response.is_sucess !== false &&
-    response.is_success !== false;
-
-  if (!requestWasSuccessful) {
+  if (response.is_success === false) {
     throw new Error(
-      getResponseMessage(
-        response,
-        "Ardayga lama diiwaangelin karin",
-      ),
+      response.message ??
+        "Ardayga lama diiwaangelin karo",
     );
   }
 

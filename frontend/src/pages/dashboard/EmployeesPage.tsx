@@ -6,63 +6,82 @@ import {
 
 import {
   CalendarDays,
-  GraduationCap,
+  DollarSign,
   LoaderCircle,
-  Percent,
   Phone,
   Plus,
   RefreshCw,
   Search,
-  School,
-  UsersRound,
+  UserRound,
+
   X,
 } from "lucide-react";
 
 import {
-  useCreateStudent,
-  useStudents,
-} from "../../hooks/school/useStudents";
+  useCreateEmployee,
+  useEmployees,
+} from "../../hooks/school/useEmployees";
 
-import { useClasses } from "../../hooks/school/useClasses";
-import { useFamilies } from "../../hooks/school/useFamilies";
-
-interface StudentForm {
+interface EmployeeForm {
   fullName: string;
-  studentCode: string;
-  classId: string;
-  familyId: string;
-  dateOfAdmission: string;
-  discountFee: string;
-  mobileNumber: string;
+  phone: string;
+  role: string;
+  pictureUrl: string;
+  dateOfJoining: string;
+  monthlySalary: string;
 }
 
-interface StudentErrors {
+interface EmployeeErrors {
   fullName?: string;
-  studentCode?: string;
-  classId?: string;
-  familyId?: string;
-  dateOfAdmission?: string;
-  discountFee?: string;
-  mobileNumber?: string;
+  phone?: string;
+  role?: string;
+  dateOfJoining?: string;
+  monthlySalary?: string;
 }
 
-const initialForm: StudentForm = {
+const initialForm: EmployeeForm = {
   fullName: "",
-  studentCode: "",
-  classId: "",
-  familyId: "",
-  dateOfAdmission: "",
-  discountFee: "0",
-  mobileNumber: "",
+  phone: "",
+  role: "",
+  pictureUrl: "",
+  dateOfJoining: "",
+  monthlySalary: "",
 };
 
-function StudentsPage() {
-  const studentsQuery = useStudents();
-  const classesQuery = useClasses();
-  const familiesQuery = useFamilies();
+const employeeRoles = [
+  "Teacher",
+  "Administrator",
+  "Cashier",
+  "Accountant",
+  "Secretary",
+  "Cleaner",
+  "Security",
+  "Other",
+];
 
-  const createStudentMutation =
-    useCreateStudent();
+function formatDate(value: string): string {
+  if (!value) {
+    return "—";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "—";
+  }
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+function EmployeesPage() {
+  const employeesQuery = useEmployees();
+
+  const createEmployeeMutation =
+    useCreateEmployee();
 
   const [showForm, setShowForm] =
     useState(false);
@@ -71,47 +90,43 @@ function StudentsPage() {
     useState("");
 
   const [form, setForm] =
-    useState<StudentForm>(initialForm);
+    useState<EmployeeForm>(initialForm);
 
   const [errors, setErrors] =
-    useState<StudentErrors>({});
+    useState<EmployeeErrors>({});
 
-  const students = studentsQuery.data ?? [];
-  const classes = classesQuery.data ?? [];
-  const families = familiesQuery.data ?? [];
+  const employees =
+    employeesQuery.data ?? [];
 
-  const filteredStudents = useMemo(() => {
+  const filteredEmployees = useMemo(() => {
     const value = search
       .trim()
       .toLowerCase();
 
     if (!value) {
-      return students;
+      return employees;
     }
 
-    return students.filter((student) => {
+    return employees.filter((employee) => {
       return (
-        student.full_name
+        employee.full_name
           .toLowerCase()
           .includes(value) ||
-        student.student_code
+        employee.phone
           .toLowerCase()
           .includes(value) ||
-        student.mobile_number
-          ?.toLowerCase()
-          .includes(value) ||
-        student.class?.title
-          ?.toLowerCase()
+        employee.role
+          .toLowerCase()
           .includes(value)
       );
     });
-  }, [search, students]);
+  }, [employees, search]);
 
   const updateField = <
-    Field extends keyof StudentForm,
+    Field extends keyof EmployeeForm,
   >(
     field: Field,
-    value: StudentForm[Field],
+    value: EmployeeForm[Field],
   ) => {
     setForm((currentForm) => ({
       ...currentForm,
@@ -130,58 +145,48 @@ function StudentsPage() {
     setErrors({});
   };
 
-  const validateForm = (): StudentErrors => {
-    const newErrors: StudentErrors = {};
+  const validateForm =
+    (): EmployeeErrors => {
+      const newErrors: EmployeeErrors = {};
 
-    if (form.fullName.trim().length < 3) {
-      newErrors.fullName =
-        "Geli magaca ardayga";
-    }
+      if (form.fullName.trim().length < 3) {
+        newErrors.fullName =
+          "Geli magaca shaqaalaha";
+      }
 
-    if (form.studentCode.trim().length < 3) {
-      newErrors.studentCode =
-        "Geli student code";
-    }
+      if (
+        !/^\+?[0-9]{7,15}$/.test(
+          form.phone.replace(/\s+/g, ""),
+        )
+      ) {
+        newErrors.phone =
+          "Geli telefoon sax ah";
+      }
 
-    if (!form.classId) {
-      newErrors.classId =
-        "Dooro fasalka";
-    }
+      if (!form.role) {
+        newErrors.role =
+          "Dooro shaqada";
+      }
 
-    if (!form.familyId) {
-      newErrors.familyId =
-        "Dooro qoyska";
-    }
+      if (!form.dateOfJoining) {
+        newErrors.dateOfJoining =
+          "Dooro taariikhda shaqada";
+      }
 
-    if (!form.dateOfAdmission) {
-      newErrors.dateOfAdmission =
-        "Dooro taariikhda";
-    }
+      const salary = Number(
+        form.monthlySalary,
+      );
 
-    const discount = Number(
-      form.discountFee,
-    );
+      if (
+        Number.isNaN(salary) ||
+        salary <= 0
+      ) {
+        newErrors.monthlySalary =
+          "Geli mushahar sax ah";
+      }
 
-    if (
-      Number.isNaN(discount) ||
-      discount < 0 ||
-      discount > 100
-    ) {
-      newErrors.discountFee =
-        "Discount-ku waa inuu noqdaa 0 ilaa 100";
-    }
-
-    if (
-      !/^\+?[0-9]{7,15}$/.test(
-        form.mobileNumber.replace(/\s+/g, ""),
-      )
-    ) {
-      newErrors.mobileNumber =
-        "Geli mobile sax ah";
-    }
-
-    return newErrors;
-  };
+      return newErrors;
+    };
 
   const handleSubmit = (
     event: FormEvent<HTMLFormElement>,
@@ -192,33 +197,31 @@ function StudentsPage() {
       validateForm();
 
     if (
-      Object.keys(validationErrors).length > 0
+      Object.keys(validationErrors).length >
+      0
     ) {
       setErrors(validationErrors);
       return;
     }
 
-    createStudentMutation.mutate(
+    createEmployeeMutation.mutate(
       {
         full_name: form.fullName.trim(),
-        student_code:
-          form.studentCode.trim(),
 
-        class_id: Number(form.classId),
+        phone: form.phone
+          .replace(/\s+/g, "")
+          .trim(),
 
-        date_of_admission:
-          form.dateOfAdmission,
+        role: form.role,
 
-        family_id: Number(form.familyId),
+        picture_url:
+          form.pictureUrl.trim(),
 
-        discount_fee: Number(
-          form.discountFee,
+        date_of_joining: `${form.dateOfJoining}T00:00:00Z`,
+
+        monthly_salary: Number(
+          form.monthlySalary,
         ),
-
-        mobile_number:
-          form.mobileNumber
-            .replace(/\s+/g, "")
-            .trim(),
       },
       {
         onSuccess: () => {
@@ -246,11 +249,11 @@ function StudentsPage() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-base font-black text-[#30201a]">
-            Ardayda
+            Shaqaalaha
           </h1>
 
           <p className="mt-0.5 text-[9px] text-slate-500">
-            Diiwaangeli oo maamul ardayda dugsiga.
+            Diiwaangeli oo maamul shaqaalaha dugsiga.
           </p>
         </div>
 
@@ -271,25 +274,25 @@ function StudentsPage() {
 
           {showForm
             ? "Xir"
-            : "Arday Cusub"}
+            : "Shaqaale Cusub"}
         </button>
       </div>
 
-      {/* Create student */}
+      {/* Create employee */}
       {showForm && (
         <section className="rounded-xl border border-[#eadbd5] bg-white p-3 shadow-sm">
           <div className="mb-3 flex items-center gap-2">
             <div className="flex size-8 items-center justify-center rounded-lg bg-[#fff0eb] text-[#8b2408]">
-              <GraduationCap size={15} />
+              <UserRound size={15} />
             </div>
 
             <div>
               <h2 className="text-[11px] font-black text-[#30201a]">
-                Diiwaangeli Arday
+                Diiwaangeli Shaqaale
               </h2>
 
               <p className="text-[8px] text-slate-500">
-                Geli xogta ardayga.
+                Geli xogta shaqaalaha cusub.
               </p>
             </div>
           </div>
@@ -302,22 +305,31 @@ function StudentsPage() {
             {/* Full name */}
             <div>
               <label className="mb-0.5 block text-[9px] font-bold text-[#51433e]">
-                Magaca Ardayga
+                Magaca Buuxa
               </label>
 
-              <input
-                value={form.fullName}
-                onChange={(event) =>
-                  updateField(
-                    "fullName",
-                    event.target.value,
-                  )
-                }
-                placeholder="Mohamed Hassan Ali"
-                className={inputClass(
-                  Boolean(errors.fullName),
-                )}
-              />
+              <div className="relative">
+                <UserRound
+                  size={13}
+                  className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
+                />
+
+                <input
+                  value={form.fullName}
+                  onChange={(event) =>
+                    updateField(
+                      "fullName",
+                      event.target.value,
+                    )
+                  }
+                  placeholder="Axmed Cali Axmed"
+                  className={`${inputClass(
+                    Boolean(
+                      errors.fullName,
+                    ),
+                  )} pl-8`}
+                />
+              </div>
 
               {errors.fullName && (
                 <p className="mt-0.5 text-[8px] text-red-600">
@@ -326,208 +338,10 @@ function StudentsPage() {
               )}
             </div>
 
-            {/* Student code */}
+            {/* Phone */}
             <div>
               <label className="mb-0.5 block text-[9px] font-bold text-[#51433e]">
-                Student Code
-              </label>
-
-              <input
-                value={form.studentCode}
-                onChange={(event) =>
-                  updateField(
-                    "studentCode",
-                    event.target.value,
-                  )
-                }
-                placeholder="STD-2026-001"
-                className={inputClass(
-                  Boolean(errors.studentCode),
-                )}
-              />
-
-              {errors.studentCode && (
-                <p className="mt-0.5 text-[8px] text-red-600">
-                  {errors.studentCode}
-                </p>
-              )}
-            </div>
-
-            {/* Class */}
-            <div>
-              <label className="mb-0.5 block text-[9px] font-bold text-[#51433e]">
-                Fasalka
-              </label>
-
-              <div className="relative">
-                <School
-                  size={13}
-                  className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-
-                <select
-                  value={form.classId}
-                  onChange={(event) =>
-                    updateField(
-                      "classId",
-                      event.target.value,
-                    )
-                  }
-                  className={`${inputClass(
-                    Boolean(errors.classId),
-                  )} appearance-none pl-8`}
-                >
-                  <option value="">
-                    Dooro fasalka
-                  </option>
-
-                  {classes.map(
-                    (schoolClass) => (
-                      <option
-                        key={schoolClass.id}
-                        value={schoolClass.id}
-                      >
-                        {schoolClass.title} -{" "}
-                        {
-                          schoolClass.AcademicYear
-                        }
-                      </option>
-                    ),
-                  )}
-                </select>
-              </div>
-
-              {errors.classId && (
-                <p className="mt-0.5 text-[8px] text-red-600">
-                  {errors.classId}
-                </p>
-              )}
-            </div>
-
-            {/* Family */}
-            <div>
-              <label className="mb-0.5 block text-[9px] font-bold text-[#51433e]">
-                Qoyska
-              </label>
-
-              <div className="relative">
-                <UsersRound
-                  size={13}
-                  className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-
-                <select
-                  value={form.familyId}
-                  onChange={(event) =>
-                    updateField(
-                      "familyId",
-                      event.target.value,
-                    )
-                  }
-                  className={`${inputClass(
-                    Boolean(errors.familyId),
-                  )} appearance-none pl-8`}
-                >
-                  <option value="">
-                    Dooro qoyska
-                  </option>
-
-                  {families.map((family) => (
-                    <option
-                      key={family.id}
-                      value={family.id}
-                    >
-                      {family.familyName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {errors.familyId && (
-                <p className="mt-0.5 text-[8px] text-red-600">
-                  {errors.familyId}
-                </p>
-              )}
-            </div>
-
-            {/* Admission date */}
-            <div>
-              <label className="mb-0.5 block text-[9px] font-bold text-[#51433e]">
-                Taariikhda Gelitaanka
-              </label>
-
-              <div className="relative">
-                <CalendarDays
-                  size={13}
-                  className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-
-                <input
-                  type="date"
-                  value={
-                    form.dateOfAdmission
-                  }
-                  onChange={(event) =>
-                    updateField(
-                      "dateOfAdmission",
-                      event.target.value,
-                    )
-                  }
-                  className={`${inputClass(
-                    Boolean(
-                      errors.dateOfAdmission,
-                    ),
-                  )} pl-8`}
-                />
-              </div>
-
-              {errors.dateOfAdmission && (
-                <p className="mt-0.5 text-[8px] text-red-600">
-                  {errors.dateOfAdmission}
-                </p>
-              )}
-            </div>
-
-            {/* Discount */}
-            <div>
-              <label className="mb-0.5 block text-[9px] font-bold text-[#51433e]">
-                Discount Fee
-              </label>
-
-              <div className="relative">
-                <Percent
-                  size={13}
-                  className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={form.discountFee}
-                  onChange={(event) =>
-                    updateField(
-                      "discountFee",
-                      event.target.value,
-                    )
-                  }
-                  className={`${inputClass(
-                    Boolean(errors.discountFee),
-                  )} pl-8`}
-                />
-              </div>
-
-              {errors.discountFee && (
-                <p className="mt-0.5 text-[8px] text-red-600">
-                  {errors.discountFee}
-                </p>
-              )}
-            </div>
-
-            {/* Mobile */}
-            <div>
-              <label className="mb-0.5 block text-[9px] font-bold text-[#51433e]">
-                Mobile Number
+                Telephone
               </label>
 
               <div className="relative">
@@ -538,31 +352,165 @@ function StudentsPage() {
 
                 <input
                   type="tel"
-                  value={form.mobileNumber}
+                  value={form.phone}
                   onChange={(event) =>
                     updateField(
-                      "mobileNumber",
+                      "phone",
                       event.target.value,
                     )
                   }
-                  placeholder="+252615000000"
+                  placeholder="+252615123456"
+                  className={`${inputClass(
+                    Boolean(errors.phone),
+                  )} pl-8`}
+                />
+              </div>
+
+              {errors.phone && (
+                <p className="mt-0.5 text-[8px] text-red-600">
+                  {errors.phone}
+                </p>
+              )}
+            </div>
+
+            {/* Role */}
+            <div>
+              <label className="mb-0.5 block text-[9px] font-bold text-[#51433e]">
+                Shaqada
+              </label>
+
+              <select
+                value={form.role}
+                onChange={(event) =>
+                  updateField(
+                    "role",
+                    event.target.value,
+                  )
+                }
+                className={`${inputClass(
+                  Boolean(errors.role),
+                )} appearance-none`}
+              >
+                <option value="">
+                  Dooro shaqada
+                </option>
+
+                {employeeRoles.map(
+                  (role) => (
+                    <option
+                      key={role}
+                      value={role}
+                    >
+                      {role}
+                    </option>
+                  ),
+                )}
+              </select>
+
+              {errors.role && (
+                <p className="mt-0.5 text-[8px] text-red-600">
+                  {errors.role}
+                </p>
+              )}
+            </div>
+
+            {/* Joining date */}
+            <div>
+              <label className="mb-0.5 block text-[9px] font-bold text-[#51433e]">
+                Taariikhda Shaqada
+              </label>
+
+              <div className="relative">
+                <CalendarDays
+                  size={13}
+                  className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
+                />
+
+                <input
+                  type="date"
+                  value={form.dateOfJoining}
+                  onChange={(event) =>
+                    updateField(
+                      "dateOfJoining",
+                      event.target.value,
+                    )
+                  }
                   className={`${inputClass(
                     Boolean(
-                      errors.mobileNumber,
+                      errors.dateOfJoining,
                     ),
                   )} pl-8`}
                 />
               </div>
 
-              {errors.mobileNumber && (
+              {errors.dateOfJoining && (
                 <p className="mt-0.5 text-[8px] text-red-600">
-                  {errors.mobileNumber}
+                  {errors.dateOfJoining}
                 </p>
               )}
             </div>
 
+            {/* Salary */}
+            <div>
+              <label className="mb-0.5 block text-[9px] font-bold text-[#51433e]">
+                Mushaharka Bishii
+              </label>
+
+              <div className="relative">
+                <DollarSign
+                  size={13}
+                  className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
+                />
+
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.monthlySalary}
+                  onChange={(event) =>
+                    updateField(
+                      "monthlySalary",
+                      event.target.value,
+                    )
+                  }
+                  placeholder="250"
+                  className={`${inputClass(
+                    Boolean(
+                      errors.monthlySalary,
+                    ),
+                  )} pl-8`}
+                />
+              </div>
+
+              {errors.monthlySalary && (
+                <p className="mt-0.5 text-[8px] text-red-600">
+                  {errors.monthlySalary}
+                </p>
+              )}
+            </div>
+
+            {/* Picture URL */}
+            <div>
+              <label className="mb-0.5 block text-[9px] font-bold text-[#51433e]">
+                Picture URL
+              </label>
+
+              <input
+                type="text"
+                value={form.pictureUrl}
+                onChange={(event) =>
+                  updateField(
+                    "pictureUrl",
+                    event.target.value,
+                  )
+                }
+                placeholder="Optional"
+                className={inputClass(false)}
+              />
+            </div>
+
             {/* Actions */}
-            <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-2">
+            <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-3 lg:justify-end">
               <button
                 type="button"
                 onClick={closeForm}
@@ -574,11 +522,11 @@ function StudentsPage() {
               <button
                 type="submit"
                 disabled={
-                  createStudentMutation.isPending
+                  createEmployeeMutation.isPending
                 }
                 className="flex h-8 items-center justify-center gap-1.5 rounded-lg bg-[#8b2408] px-4 text-[9px] font-black text-white disabled:opacity-60"
               >
-                {createStudentMutation.isPending ? (
+                {createEmployeeMutation.isPending ? (
                   <LoaderCircle
                     size={13}
                     className="animate-spin"
@@ -587,23 +535,23 @@ function StudentsPage() {
                   <Plus size={13} />
                 )}
 
-                Kaydi Ardayga
+                Kaydi Shaqaalaha
               </button>
             </div>
           </form>
         </section>
       )}
 
-      {/* Student list */}
+      {/* Employees list */}
       <section className="rounded-xl border border-[#eadbd5] bg-white shadow-sm">
         <div className="flex items-center justify-between gap-3 border-b border-[#eee1dc] p-3">
           <div>
             <h2 className="text-[11px] font-black text-[#30201a]">
-              Liiska Ardayda
+              Liiska Shaqaalaha
             </h2>
 
             <p className="text-[8px] text-slate-500">
-              Wadarta: {students.length}
+              Wadarta: {employees.length}
             </p>
           </div>
 
@@ -629,14 +577,15 @@ function StudentsPage() {
             <button
               type="button"
               onClick={() =>
-                studentsQuery.refetch()
+                employeesQuery.refetch()
               }
               className="flex size-8 items-center justify-center rounded-lg border border-[#dfcbc4] text-[#8b2408]"
+              aria-label="Refresh employees"
             >
               <RefreshCw
                 size={12}
                 className={
-                  studentsQuery.isFetching
+                  employeesQuery.isFetching
                     ? "animate-spin"
                     : ""
                 }
@@ -645,74 +594,116 @@ function StudentsPage() {
           </div>
         </div>
 
-        {studentsQuery.isLoading ? (
+        {employeesQuery.isLoading ? (
           <div className="flex h-32 items-center justify-center">
             <LoaderCircle
               size={20}
               className="animate-spin text-[#8b2408]"
             />
           </div>
-        ) : filteredStudents.length === 0 ? (
+        ) : filteredEmployees.length ===
+          0 ? (
           <div className="flex h-32 items-center justify-center">
             <p className="text-[9px] text-slate-500">
-              Arday lama helin.
+              Shaqaale lama helin.
             </p>
           </div>
         ) : (
           <div className="divide-y divide-[#f0e4df]">
-            {filteredStudents.map(
-              (student) => (
+            {filteredEmployees.map(
+              (employee) => (
                 <div
-                  key={student.id}
-                  className="grid items-center gap-2 px-3 py-2 hover:bg-[#fffaf8] sm:grid-cols-[1.4fr_1fr_1fr_1fr]"
+                  key={employee.id}
+                  className="grid items-center gap-2 px-3 py-2 transition hover:bg-[#fffaf8] sm:grid-cols-[1.4fr_1fr_1fr_0.8fr_0.7fr]"
                 >
+                  {/* Employee */}
                   <div className="flex min-w-0 items-center gap-2">
-                    <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-[#fff0eb] text-[#8b2408]">
-                      <GraduationCap
-                        size={13}
+                    {employee.picture_url ? (
+                      <img
+                        src={employee.picture_url}
+                        alt={employee.full_name}
+                        className="size-7 shrink-0 rounded-md object-cover"
                       />
-                    </div>
+                    ) : (
+                      <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-[#fff0eb] text-[#8b2408]">
+                        <UserRound size={13} />
+                      </div>
+                    )}
 
                     <div className="min-w-0">
                       <p className="truncate text-[10px] font-black text-[#30201a]">
-                        {student.full_name}
+                        {employee.full_name}
                       </p>
 
                       <p className="text-[8px] text-slate-400">
-                        {student.student_code}
+                        ID #{employee.id}
                       </p>
                     </div>
                   </div>
 
+                  {/* Role */}
                   <div>
                     <p className="text-[8px] text-slate-400">
-                      Fasalka
+                      Shaqada
                     </p>
 
                     <p className="text-[9px] font-bold text-[#51433e]">
-                      {student.class?.title ??
-                        "—"}
+                      {employee.role}
                     </p>
                   </div>
 
+                  {/* Phone */}
                   <div>
                     <p className="text-[8px] text-slate-400">
-                      Mobile
+                      Telephone
                     </p>
 
                     <p className="text-[9px] font-bold text-[#51433e]">
-                      {student.mobile_number ??
-                        "—"}
+                      {employee.phone}
                     </p>
                   </div>
 
+                  {/* Salary */}
                   <div>
                     <p className="text-[8px] text-slate-400">
-                      Discount
+                      Mushahar
                     </p>
 
                     <p className="text-[9px] font-black text-[#8b2408]">
-                      {student.discount_fee ?? 0}%
+                      $
+                      {employee.monthly_salary.toFixed(
+                        2,
+                      )}
+                    </p>
+                  </div>
+
+                  {/* Status */}
+                  <div>
+                    <p className="text-[8px] text-slate-400">
+                      Status
+                    </p>
+
+                    <span
+                      className={`inline-flex rounded-full px-2 py-0.5 text-[8px] font-black ${
+                        employee.is_active
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-slate-100 text-slate-500"
+                      }`}
+                    >
+                      {employee.is_active
+                        ? "ACTIVE"
+                        : "INACTIVE"}
+                    </span>
+                  </div>
+
+                  <div className="sm:col-span-5">
+                    <p className="text-[8px] text-slate-400">
+                      Shaqada bilaabay:{" "}
+                      <span className="font-bold text-slate-500">
+                        {formatDate(
+                          employee.date_of_joining,
+                        )}
+                      </span>
                     </p>
                   </div>
                 </div>
@@ -725,4 +716,4 @@ function StudentsPage() {
   );
 }
 
-export default StudentsPage;
+export default EmployeesPage;

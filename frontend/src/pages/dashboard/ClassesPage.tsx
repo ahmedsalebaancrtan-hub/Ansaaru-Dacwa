@@ -159,7 +159,7 @@ function ClassesPage() {
       {/* Page heading */}
       <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-black text-[#30201a] sm:text-3xl">
+          <h1 className="font-black text-[#30201a]">
             Fasallada
           </h1>
 

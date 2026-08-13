@@ -4,21 +4,20 @@ import {
 } from "react";
 
 import {
+  BookOpenCheck,
   Eye,
   EyeOff,
-  GraduationCap,
-  IdCard,
   LoaderCircle,
   LockKeyhole,
   Mail,
   ShieldCheck,
-  TrendingUp,
-  Users,
+  UsersRound,
   WalletCards,
 } from "lucide-react";
 
+import { Link } from "react-router-dom";
+
 import { useLogin } from "../../hooks/auth/useLogin";
-import { Link } from "react-router";
 
 interface LoginForm {
   emailaddress: string;
@@ -37,25 +36,29 @@ const initialForm: LoginForm = {
   remember: false,
 };
 
+const LOGO_PATH = "/logo.jpeg";
+
 function validateForm(form: LoginForm): FormErrors {
   const errors: FormErrors = {};
 
   if (!form.emailaddress.trim()) {
-    errors.emailaddress = "Email address is required";
+    errors.emailaddress =
+      "Email-ka waa required";
   } else if (
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
       form.emailaddress,
     )
   ) {
     errors.emailaddress =
-      "Enter a valid email address";
+      "Geli email sax ah";
   }
 
   if (!form.password) {
-    errors.password = "Password is required";
+    errors.password =
+      "Password-ku waa required";
   } else if (form.password.length < 8) {
     errors.password =
-      "Password must be at least 8 characters";
+      "Password-ku waa inuu ugu yaraan yahay 8 xaraf";
   }
 
   return errors;
@@ -102,16 +105,20 @@ function LoginPage() {
   ) => {
     event.preventDefault();
 
-    const validationErrors = validateForm(form);
+    const validationErrors =
+      validateForm(form);
 
-    if (Object.keys(validationErrors).length > 0) {
+    if (
+      Object.keys(validationErrors).length > 0
+    ) {
       setErrors(validationErrors);
       return;
     }
 
     loginMutation.mutate({
       credentials: {
-        emailaddress: form.emailaddress.trim(),
+        emailaddress:
+          form.emailaddress.trim(),
         password: form.password,
       },
 
@@ -120,54 +127,61 @@ function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#fffaf8] lg:grid lg:grid-cols-2">
-      {/* Login form section */}
-      <section className="flex min-h-screen items-center justify-center px-6 py-10 sm:px-12 lg:px-16">
-        <div className="w-full max-w-xl">
-          <div className="mb-12 flex items-center gap-4">
-            <div className="flex size-12 items-center justify-center rounded-xl bg-[#8b2408] text-white shadow-lg shadow-orange-950/15">
-              <GraduationCap size={27} />
+    <main className="grid h-dvh overflow-hidden bg-[#fffaf8] lg:grid-cols-2">
+      {/* Login section */}
+      <section className="flex h-full items-center justify-center overflow-hidden px-4 py-3 sm:px-6 lg:px-10">
+        <div className="w-full max-w-sm">
+          {/* School identity */}
+          <div className="mb-4 flex items-center gap-2.5">
+            <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[#eadbd5] bg-white p-1 shadow-sm">
+              <img
+                src={LOGO_PATH}
+                alt="Ansaaru Dacwa Islamic School logo"
+                className="h-full w-full object-contain"
+              />
             </div>
 
-            <div>
-              <h1 className="text-xl font-bold text-[#42160c] sm:text-2xl">
+            <div className="min-w-0">
+              <h1 className="truncate text-sm font-black text-[#42160c]">
                 Ansaaru Dacwa Islamic School
               </h1>
 
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-0.5 text-[9px] font-medium text-slate-500">
                 Nidaamka maamulka dugsiga
               </p>
             </div>
           </div>
 
-          <div className="mb-10">
-            <h2 className="text-3xl font-bold tracking-tight text-[#201916] sm:text-4xl">
-              Soo Dhawoow Mudane
+          {/* Welcome heading */}
+          <div className="mb-4">
+            <h2 className="text-xl font-black tracking-tight text-[#201916]">
+              Soo Dhawoow
             </h2>
 
-            <p className="mt-3 text-base text-slate-500">
-              Fadlan geli macluumaadkaaga si aad u
-              gasho nidaamka.
+            <p className="mt-1 text-[11px] text-slate-500">
+              Geli macluumaadkaaga si aad
+              nidaamka u gasho.
             </p>
           </div>
 
           <form
-            className="space-y-6"
             onSubmit={handleSubmit}
+            className="space-y-3"
             noValidate
           >
+            {/* Email */}
             <div>
               <label
                 htmlFor="emailaddress"
-                className="mb-2 block text-sm font-semibold text-[#51433e]"
+                className="mb-1 block text-[10px] font-bold text-[#51433e]"
               >
                 Email Address
               </label>
 
               <div className="relative">
                 <Mail
-                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#9b857d]"
-                  size={21}
+                  size={15}
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9b857d]"
                 />
 
                 <input
@@ -176,14 +190,16 @@ function LoginPage() {
                   type="email"
                   value={form.emailaddress}
                   onChange={(event) =>
-                    updateEmail(event.target.value)
+                    updateEmail(
+                      event.target.value,
+                    )
                   }
-                  placeholder="Tusaale: ahmed@gmail.com"
+                  placeholder="ahmed@gmail.com"
                   autoComplete="email"
                   aria-invalid={Boolean(
                     errors.emailaddress,
                   )}
-                  className={`h-15 w-full rounded-xl border bg-[#fff4f0] pl-12 pr-4 text-[#2d211d] outline-none transition placeholder:text-[#a7958e] focus:bg-white focus:ring-4 ${
+                  className={`h-9 w-full rounded-lg border bg-[#fff4f0] pl-9 pr-3 text-[11px] text-[#2d211d] outline-none transition placeholder:text-[#a7958e] focus:bg-white focus:ring-2 ${
                     errors.emailaddress
                       ? "border-red-400 focus:border-red-500 focus:ring-red-100"
                       : "border-[#dfcbc4] focus:border-[#9b3215] focus:ring-orange-100"
@@ -192,49 +208,56 @@ function LoginPage() {
               </div>
 
               {errors.emailaddress && (
-                <p className="mt-2 text-sm text-red-600">
+                <p className="mt-1 text-[9px] font-medium text-red-600">
                   {errors.emailaddress}
                 </p>
               )}
             </div>
 
+            {/* Password */}
             <div>
-              <div className="mb-2 flex items-center justify-between gap-4">
+              <div className="mb-1 flex items-center justify-between gap-3">
                 <label
                   htmlFor="password"
-                  className="text-sm font-semibold text-[#51433e]"
+                  className="text-[10px] font-bold text-[#51433e]"
                 >
                   Furaha Sirta ah
                 </label>
 
-               <Link
-  to="/forgot-password"
-  className="text-sm font-semibold text-[#7c2a13] transition hover:underline"
->
-  Ma illoowday Furaha?
-</Link>
+                <Link
+                  to="/forgot-password"
+                  className="text-[9px] font-bold text-[#7c2a13] transition hover:underline"
+                >
+                  Ma illoowday?
+                </Link>
               </div>
 
               <div className="relative">
                 <LockKeyhole
-                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#9b857d]"
-                  size={21}
+                  size={15}
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9b857d]"
                 />
 
                 <input
                   id="password"
                   name="password"
                   type={
-                    showPassword ? "text" : "password"
+                    showPassword
+                      ? "text"
+                      : "password"
                   }
                   value={form.password}
                   onChange={(event) =>
-                    updatePassword(event.target.value)
+                    updatePassword(
+                      event.target.value,
+                    )
                   }
                   placeholder="Geli furahaaga"
                   autoComplete="current-password"
-                  aria-invalid={Boolean(errors.password)}
-                  className={`h-15 w-full rounded-xl border bg-[#fff4f0] pl-12 pr-14 text-[#2d211d] outline-none transition placeholder:text-[#a7958e] focus:bg-white focus:ring-4 ${
+                  aria-invalid={Boolean(
+                    errors.password,
+                  )}
+                  className={`h-9 w-full rounded-lg border bg-[#fff4f0] pl-9 pr-10 text-[11px] text-[#2d211d] outline-none transition placeholder:text-[#a7958e] focus:bg-white focus:ring-2 ${
                     errors.password
                       ? "border-red-400 focus:border-red-500 focus:ring-red-100"
                       : "border-[#dfcbc4] focus:border-[#9b3215] focus:ring-orange-100"
@@ -245,10 +268,11 @@ function LoginPage() {
                   type="button"
                   onClick={() =>
                     setShowPassword(
-                      (currentValue) => !currentValue,
+                      (currentValue) =>
+                        !currentValue,
                     )
                   }
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#87736c] transition hover:text-[#6d210d]"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#87736c] transition hover:text-[#6d210d]"
                   aria-label={
                     showPassword
                       ? "Hide password"
@@ -256,76 +280,90 @@ function LoginPage() {
                   }
                 >
                   {showPassword ? (
-                    <EyeOff size={22} />
+                    <EyeOff size={16} />
                   ) : (
-                    <Eye size={22} />
+                    <Eye size={16} />
                   )}
                 </button>
               </div>
 
               {errors.password && (
-                <p className="mt-2 text-sm text-red-600">
+                <p className="mt-1 text-[9px] font-medium text-red-600">
                   {errors.password}
                 </p>
               )}
             </div>
 
-            <label className="flex w-fit cursor-pointer items-center gap-3 text-sm text-[#5e514c]">
+            {/* Remember me */}
+            <label className="flex w-fit cursor-pointer items-center gap-1.5 text-[10px] font-medium text-[#5e514c]">
               <input
                 type="checkbox"
                 checked={form.remember}
                 onChange={(event) =>
                   setForm((currentForm) => ({
                     ...currentForm,
-                    remember: event.target.checked,
+                    remember:
+                      event.target.checked,
                   }))
                 }
-                className="size-5 rounded border-[#d7c2ba] accent-[#8b2408]"
+                className="size-3.5 rounded border-[#d7c2ba] accent-[#8b2408]"
               />
 
               Xasuuso akoonkayga
             </label>
 
+            {/* Submit */}
             <button
               type="submit"
-              disabled={loginMutation.isPending}
-              className="flex h-15 w-full items-center justify-center gap-2 rounded-xl bg-[#087faa] px-6 font-bold text-white shadow-lg shadow-cyan-900/15 transition hover:bg-[#066f96] focus:outline-none focus:ring-4 focus:ring-cyan-200 disabled:cursor-not-allowed disabled:opacity-65"
+              disabled={
+                loginMutation.isPending
+              }
+              className="flex h-9 w-full items-center justify-center gap-1.5 rounded-lg bg-[#087faa] px-4 text-[11px] font-black text-white shadow-sm transition hover:bg-[#066f96] focus:outline-none focus:ring-2 focus:ring-cyan-200 disabled:cursor-not-allowed disabled:opacity-65"
             >
               {loginMutation.isPending ? (
                 <>
                   <LoaderCircle
-                    size={21}
+                    size={15}
                     className="animate-spin"
                   />
+
                   Waa lagu gelinayaa...
                 </>
               ) : (
                 "Soo Gal Nidaamka"
               )}
             </button>
-            <Link
-  to="/register"
-  className="font-semibold text-[#7c2a13] hover:underline"
->
-  Samee akoon cusub
-</Link>
+
+            {/* Register link */}
+            <p className="text-center text-[9px] text-slate-500">
+              Akoon ma lihid?{" "}
+              <Link
+                to="/register"
+                className="font-black text-[#7c2a13] hover:underline"
+              >
+                Samee akoon cusub
+              </Link>
+            </p>
           </form>
 
-          <div className="mt-12 border-t border-[#eaded9] pt-7">
-            <div className="flex flex-wrap items-center justify-between gap-5 text-sm text-slate-500">
-              <span className="flex items-center gap-2">
+          {/* Security */}
+          <div className="mt-4 border-t border-[#eaded9] pt-3">
+            <div className="flex items-center justify-between gap-2 text-[9px] font-medium text-slate-500">
+              <span className="flex items-center gap-1">
                 <ShieldCheck
-                  size={18}
+                  size={13}
                   className="text-[#74240e]"
                 />
+
                 Xogtaadu waa ammaan
               </span>
 
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-1">
                 <LockKeyhole
-                  size={17}
+                  size={12}
                   className="text-[#74240e]"
                 />
+
                 SSL encrypted
               </span>
             </div>
@@ -333,122 +371,99 @@ function LoginPage() {
         </div>
       </section>
 
-      {/* Decorative information panel */}
-      <section className="relative hidden min-h-screen overflow-hidden bg-gradient-to-br from-[#9c3a19] via-[#7c2308] to-[#3e1005] p-12 text-white lg:flex lg:flex-col lg:justify-between xl:p-20">
-        <div className="absolute -right-40 -top-40 size-96 rounded-full bg-orange-400/20 blur-3xl" />
-        <div className="absolute -bottom-48 -left-32 size-[28rem] rounded-full bg-black/25 blur-3xl" />
+      {/* Right information section */}
+      <section className="relative hidden h-full overflow-hidden bg-gradient-to-br from-[#9c3a19] via-[#7c2308] to-[#3e1005] p-7 text-white lg:flex lg:items-center lg:justify-center xl:p-10">
+        <div className="absolute -right-28 -top-28 size-72 rounded-full bg-orange-400/20 blur-3xl" />
 
-        <div className="relative z-10">
-          <div className="inline-flex items-center gap-3 rounded-full border border-white/30 bg-white/10 px-5 py-3 text-sm font-semibold tracking-wide backdrop-blur-md">
-            <span className="size-2.5 rounded-full bg-emerald-400" />
-            NIDAAMKA MAAMULKA DUGSIGAAGA
+        <div className="absolute -bottom-32 -left-24 size-80 rounded-full bg-black/25 blur-3xl" />
+
+        <div className="relative z-10 w-full max-w-md">
+          {/* Logo */}
+          <div className="flex items-center gap-2.5">
+            <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/25 bg-white p-1 shadow-md">
+              <img
+                src={LOGO_PATH}
+                alt="Ansaaru Dacwa logo"
+                className="h-full w-full object-contain"
+              />
+            </div>
+
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-widest text-orange-100/75">
+                Nidaamka Maamulka
+              </p>
+
+              <h2 className="mt-0.5 text-sm font-black">
+                Ansaaru Dacwa
+              </h2>
+            </div>
           </div>
 
-          <h2 className="mt-10 max-w-2xl text-5xl font-bold leading-[1.08] tracking-tight xl:text-6xl">
-            Mustaqbalka Waxbarashada Maanta Halkaan Ka
-            Bilow
-          </h2>
+          <h3 className="mt-6 text-2xl font-black leading-tight tracking-tight">
+            Maamul dugsigaaga si fudud oo
+            casri ah
+          </h3>
 
-          <p className="mt-6 max-w-xl text-lg leading-8 text-orange-50/80">
-            Si fudud u maamul ardayda, macallimiinta,
-            lacagaha iyo dhammaan howlaha dugsiga.
+          <p className="mt-2 max-w-sm text-[11px] leading-5 text-orange-50/75">
+            Hal meel kaga maamul ardayda,
+            fasallada, macallimiinta iyo
+            maaliyadda dugsiga.
           </p>
-        </div>
 
-        <div className="relative z-10 my-12 rounded-[2rem] border border-white/20 bg-black/20 p-6 shadow-2xl backdrop-blur-md">
-          <div className="grid gap-5 sm:grid-cols-3">
-            <div className="rounded-2xl bg-white/95 p-5 text-[#35150c]">
-              <Users
-                size={27}
-                className="text-[#8b2408]"
-              />
+          {/* Features */}
+          <div className="mt-6 space-y-2">
+            <div className="flex items-center gap-2.5 rounded-lg border border-white/15 bg-white/10 p-2.5 backdrop-blur-sm">
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/15">
+                <UsersRound size={15} />
+              </div>
 
-              <p className="mt-5 text-sm text-slate-500">
-                Ardayda
-              </p>
-
-              <p className="mt-1 text-2xl font-bold">
-                1,248
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-white/95 p-5 text-[#35150c]">
-              <TrendingUp
-                size={27}
-                className="text-emerald-600"
-              />
-
-              <p className="mt-5 text-sm text-slate-500">
-                Kobaca
-              </p>
-
-              <p className="mt-1 text-2xl font-bold">
-                +24%
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-white/95 p-5 text-[#35150c]">
-              <WalletCards
-                size={27}
-                className="text-[#8b2408]"
-              />
-
-              <p className="mt-5 text-sm text-slate-500">
-                Lacagaha
-              </p>
-
-              <p className="mt-1 text-2xl font-bold">
-                98.2%
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-5 rounded-2xl border border-white/15 bg-[#082631]/85 p-6">
-            <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-cyan-100/70">
-                  Warbixinta maanta
+                <p className="text-[11px] font-black">
+                  Maamulka Ardayda
                 </p>
 
-                <p className="mt-2 text-xl font-semibold">
-                  Howlaha dugsiga
+                <p className="mt-0.5 text-[9px] text-orange-50/65">
+                  Diiwaangelin iyo xog
+                  dhammeystiran
                 </p>
               </div>
-
-              <IdCard className="text-cyan-300" />
             </div>
 
-            <div className="mt-8 grid grid-cols-7 items-end gap-3">
-              {[35, 55, 42, 72, 88, 66, 80].map(
-                (height, index) => (
-                  <div
-                    key={index}
-                    className="rounded-t-md bg-cyan-300/70"
-                    style={{
-                      height: `${height}px`,
-                    }}
-                  />
-                ),
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="relative z-10 flex items-center gap-4">
-          <div className="flex -space-x-3">
-            {["AM", "HN", "YS"].map((initials) => (
-              <div
-                key={initials}
-                className="flex size-10 items-center justify-center rounded-full border-2 border-[#7c2308] bg-orange-100 text-xs font-bold text-[#6d210d]"
-              >
-                {initials}
+            <div className="flex items-center gap-2.5 rounded-lg border border-white/15 bg-white/10 p-2.5 backdrop-blur-sm">
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/15">
+                <BookOpenCheck size={15} />
               </div>
-            ))}
+
+              <div>
+                <p className="text-[11px] font-black">
+                  Fasallada iyo Waxbarashada
+                </p>
+
+                <p className="mt-0.5 text-[9px] text-orange-50/65">
+                  La socod fudud oo nidaamsan
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 rounded-lg border border-white/15 bg-white/10 p-2.5 backdrop-blur-sm">
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/15">
+                <WalletCards size={15} />
+              </div>
+
+              <div>
+                <p className="text-[11px] font-black">
+                  Maaliyadda Dugsiga
+                </p>
+
+                <p className="mt-0.5 text-[9px] text-orange-50/65">
+                  Lacagaha iyo warbixinnada
+                </p>
+              </div>
+            </div>
           </div>
 
-          <p className="text-sm text-orange-50/80">
-            Waxaa ku kalsoon in ka badan 500 oo maamule
-            dugsi.
+          <p className="mt-6 text-[9px] text-orange-50/55">
+            © 2026 Ansaaru Dacwa Islamic School
           </p>
         </div>
       </section>

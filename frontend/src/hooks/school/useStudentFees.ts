@@ -7,34 +7,36 @@ import {
 import toast from "react-hot-toast";
 
 import {
-  createStudent,
-  getStudents,
-} from "../../api/school/students.api";
+  getStudentFeePayments,
+  payStudentFee,
+} from "../../api/school/studentFees.api";
 
 import { getApiErrorMessage } from "../../utils/getApiErrorMessage";
 
-const studentsQueryKey = ["students"];
+const studentFeesQueryKey = [
+  "student-fee-payments",
+];
 
-export function useStudents() {
+export function useStudentFeePayments() {
   return useQuery({
-    queryKey: studentsQueryKey,
-    queryFn: getStudents,
+    queryKey: studentFeesQueryKey,
+    queryFn: getStudentFeePayments,
   });
 }
 
-export function useCreateStudent() {
+export function usePayStudentFee() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createStudent,
+    mutationFn: payStudentFee,
 
     onSuccess: async () => {
       toast.success(
-        "Ardayga waa diiwaangeliyay",
+        "Lacagta ardayga waa la diiwaangeliyay",
       );
 
       await queryClient.invalidateQueries({
-        queryKey: studentsQueryKey,
+        queryKey: studentFeesQueryKey,
       });
     },
 
@@ -42,7 +44,7 @@ export function useCreateStudent() {
       toast.error(
         getApiErrorMessage(
           error,
-          "Ardayga lama diiwaangelin",
+          "Lacagta ardayga lama kaydin ",
         ),
       );
     },

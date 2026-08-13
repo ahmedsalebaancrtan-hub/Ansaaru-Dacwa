@@ -1,55 +1,43 @@
-export type StudentGender = "male" | "female";
+import type { SchoolClass } from "./class.types";
+import type { Family } from "./family.types";
 
-export interface StudentFamily {
-  id: number;
-  familyName: string;
-  Parent_one_Name: string;
-  parent_one_phone: string;
-  Parent_two_name: string;
-  Parent_two_phone: string;
-  address: string;
-  Createdat: string;
-  UpdatedAt: string;
-}
-
-// Student-ka backend-ka kasoo noqonaya.
 export interface Student {
   id: number;
   student_code: string;
-  first_name: string;
-  middle_name: string;
-  last_name: string;
-  gender: StudentGender | string;
-  Createdat: string;
-  UpdatedAt: string;
-  familyId: number;
-  family?: StudentFamily;
+  full_name: string;
+
+  class_id: number;
+  class: SchoolClass;
+
+  date_of_admission: string;
+  discount_fee: number;
+  mobile_number: string;
+
+  family_id: number;
+  family?: Family;
+
+  created_at: string;
+  updated_at: string;
 }
 
-// Xogta loo dirayo marka arday cusub la samaynayo.
 export interface CreateStudentRequest {
-  first_name: string;
-  middle_name: string;
-  last_name: string;
+  full_name: string;
   student_code: string;
-  family_name: string;
-  parent_one_name: string;
-  parent_one_phone: string;
-  gender: StudentGender;
+  class_id: number;
+  date_of_admission: string;
+  family_id: number;
+  discount_fee: number;
+  mobile_number: string;
 }
 
-export interface StudentApiResponse {
+export interface StudentsResponse {
+  data: Student[];
+  is_success: boolean;
+  message?: string;
+}
+
+export interface CreateStudentResponse {
   data?: Student;
-  is_sucess?: boolean;
   is_success?: boolean;
   message?: string;
-  messege?: string;
-}
-
-export interface StudentsApiResponse {
-  data?: Student[];
-  is_sucess?: boolean;
-  is_success?: boolean;
-  message?: string;
-  messege?: string;
 }

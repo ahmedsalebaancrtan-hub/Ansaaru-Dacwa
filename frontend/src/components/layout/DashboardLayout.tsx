@@ -4,10 +4,10 @@ import {
   CalendarCheck,
   ChevronDown,
   CircleHelp,
-  ClipboardCheck,
+
   FileText,
   GraduationCap,
-  HeartPulse,
+
   House,
   Landmark,
   LogOut,
@@ -15,10 +15,9 @@ import {
   Plus,
   School,
   Search,
-  ShieldAlert,
-  UserCheck,
+
   UserRound,
-  Users,
+  
   UsersRound,
   WalletCards,
   X,
@@ -69,14 +68,10 @@ const navigationGroups: NavigationGroup[] = [
       },
     ],
   },
+
   {
     title: "Maamulka Dugsiga",
     items: [
-      {
-        name: "Isticmaalayaasha",
-        path: "/dashboard/users",
-        icon: Users,
-      },
       {
         name: "Qoysaska",
         path: "/dashboard/families",
@@ -93,13 +88,8 @@ const navigationGroups: NavigationGroup[] = [
         icon: School,
       },
       {
-  name: "Ardayda Fasallada",
-  path: "/dashboard/student-classes",
-  icon: UserCheck,
-},
-      {
-        name: "Macallimiinta",
-        path: "/dashboard/teachers",
+        name: "Shaqaalaha",
+        path: "/dashboard/employees",
         icon: UserRound,
       },
       {
@@ -109,6 +99,7 @@ const navigationGroups: NavigationGroup[] = [
       },
     ],
   },
+
   {
     title: "Imaanshaha",
     items: [
@@ -117,18 +108,9 @@ const navigationGroups: NavigationGroup[] = [
         path: "/dashboard/attendance",
         icon: CalendarCheck,
       },
-      {
-        name: "Attendance Students",
-        path: "/dashboard/attendance-students",
-        icon: UserCheck,
-      },
-      {
-        name: "Imaanshaha Macallimiinta",
-        path: "/dashboard/teacher-attendance",
-        icon: ClipboardCheck,
-      },
     ],
   },
+
   {
     title: "Waxbarashada",
     items: [
@@ -137,45 +119,21 @@ const navigationGroups: NavigationGroup[] = [
         path: "/dashboard/exams",
         icon: FileText,
       },
-      {
-        name: "Anshaxa",
-        path: "/dashboard/discipline",
-        icon: ShieldAlert,
-      },
-      {
-        name: "Caafimaadka",
-        path: "/dashboard/health",
-        icon: HeartPulse,
-      },
     ],
   },
+
   {
     title: "Maaliyadda",
     items: [
-      {
-        name: "Maaliyadda",
-        path: "/dashboard/finance",
-        icon: Landmark,
-      },
       {
         name: "Lacagaha Ardayda",
         path: "/dashboard/fees",
         icon: WalletCards,
       },
       {
-        name: "Lacagaha Qoysaska",
-        path: "/dashboard/family-fees",
-        icon: UsersRound,
-      },
-      {
-        name: "Family Fee Students",
-        path: "/dashboard/family-fee-students",
-        icon: UserCheck,
-      },
-      {
         name: "Mushaharka",
         path: "/dashboard/salaries",
-        icon: WalletCards,
+        icon: Landmark,
       },
     ],
   },

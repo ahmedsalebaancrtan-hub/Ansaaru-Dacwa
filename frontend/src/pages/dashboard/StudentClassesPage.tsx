@@ -14,6 +14,7 @@ import {
   School,
   Search,
   UserCheck,
+  UserMinus,
   X,
 } from "lucide-react";
 
@@ -27,6 +28,7 @@ import {
 
 import {
   useAddStudentToClass,
+  useDeactivateStudentClass,
   useStudentClasses,
 } from "../../hooks/school/useStudentClasses";
 
@@ -86,11 +88,19 @@ function formatDate(value: string): string {
 function StudentClassesPage() {
   const studentsQuery = useStudents();
   const classesQuery = useClasses();
+
+  // Class filter — drives the student-class list query.
+  const [selectedClassId, setSelectedClassId] =
+    useState<number | undefined>(undefined);
+
   const studentClassesQuery =
-    useStudentClasses();
+    useStudentClasses(selectedClassId);
 
   const addStudentMutation =
     useAddStudentToClass();
+
+  const deactivateMutation =
+    useDeactivateStudentClass();
 
   const [showCreateForm, setShowCreateForm] =
     useState(false);
@@ -220,9 +230,16 @@ function StudentClassesPage() {
       {
         onSuccess: () => {
           closeCreateForm();
+          // If the added class matches the current filter, the query
+          // will auto-refresh via invalidateQueries in the hook.
         },
       },
     );
+  };
+
+  const handleDeactivate = (studentId: number) => {
+    if (deactivateMutation.isPending) return;
+    deactivateMutation.mutate(studentId);
   };
 
   const isReferenceDataLoading =
@@ -273,11 +290,15 @@ function StudentClassesPage() {
           </div>
 
           <p className="mt-4 text-sm font-semibold text-slate-500">
-            Dhammaan Assignments
+            {selectedClassId !== undefined
+              ? "Fasalkan Assignments"
+              : "Dooro Fasal"}
           </p>
 
           <p className="mt-1 text-3xl font-black text-[#30201a]">
-            {studentClasses.length}
+            {selectedClassId !== undefined
+              ? studentClasses.length
+              : "—"}
           </p>
         </article>
 
@@ -291,7 +312,9 @@ function StudentClassesPage() {
           </p>
 
           <p className="mt-1 text-3xl font-black text-[#30201a]">
-            {activeAssignments}
+            {selectedClassId !== undefined
+              ? activeAssignments
+              : "—"}
           </p>
         </article>
 
@@ -498,99 +521,174 @@ function StudentClassesPage() {
 
       {/* Assignments list */}
       <section className="overflow-hidden rounded-2xl border border-[#eadbd5] bg-white shadow-sm">
-        <header className="flex flex-col gap-4 border-b border-[#eee2dd] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-          <div>
-            <h2 className="font-black text-[#30201a]">
-              Liiska Ardayda Fasallada
-            </h2>
+        <header className="flex flex-col gap-4 border-b border-[#eee2dd] p-5 sm:p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="font-black text-[#30201a]">
+                Liiska Ardayda Fasallada
+              </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
-              Wadarta: {studentClasses.length} assignment
-            </p>
-          </div>
-
-          <div className="flex w-full gap-2 sm:w-auto">
-            <div className="relative flex-1 sm:w-72">
-              <Search
-                size={18}
-                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-
-              <input
-                type="search"
-                value={searchValue}
-                onChange={(event) =>
-                  setSearchValue(event.target.value)
-                }
-                placeholder="Raadi arday ama fasal..."
-                className="h-11 w-full rounded-xl border border-[#dfd0ca] bg-[#fffaf8] pl-11 pr-4 text-sm outline-none transition focus:border-[#8b2408] focus:bg-white focus:ring-4 focus:ring-orange-100"
-              />
-            </div>
-
-            <button
-              type="button"
-              onClick={() =>
-                studentClassesQuery.refetch()
-              }
-              disabled={
-                studentClassesQuery.isFetching
-              }
-              className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-[#dfd0ca] text-[#76564b] transition hover:bg-[#fff0eb] disabled:opacity-60"
-              aria-label="Refresh assignments"
-            >
-              <RefreshCw
-                size={18}
-                className={
-                  studentClassesQuery.isFetching
-                    ? "animate-spin"
-                    : ""
-                }
-              />
-            </button>
-          </div>
-        </header>
-
-        {studentClassesQuery.isLoading && (
-          <div className="flex min-h-72 items-center justify-center">
-            <div className="text-center">
-              <LoaderCircle
-                size={34}
-                className="mx-auto animate-spin text-[#8b2408]"
-              />
-
-              <p className="mt-3 text-sm text-slate-500">
-                Xogta waa la soo qaadayaa...
+              <p className="mt-1 text-sm text-slate-500">
+                {selectedClassId !== undefined
+                  ? `Wadarta: ${studentClasses.length} assignment`
+                  : "Dooro fasal si aad u aragto ardayda"}
               </p>
             </div>
-          </div>
-        )}
 
-        {studentClassesQuery.isError && (
-          <div className="flex min-h-72 items-center justify-center p-6 text-center">
-            <div>
-              <AlertCircle
-                size={38}
-                className="mx-auto text-red-500"
-              />
+            <div className="flex w-full gap-2 sm:w-auto">
+              <div className="relative flex-1 sm:w-72">
+                <Search
+                  size={18}
+                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                />
 
-              <h3 className="mt-4 font-black text-[#30201a]">
-                Xogta lama soo heli karin
-              </h3>
+                <input
+                  type="search"
+                  value={searchValue}
+                  onChange={(event) =>
+                    setSearchValue(event.target.value)
+                  }
+                  placeholder="Raadi arday ama fasal..."
+                  className="h-11 w-full rounded-xl border border-[#dfd0ca] bg-[#fffaf8] pl-11 pr-4 text-sm outline-none transition focus:border-[#8b2408] focus:bg-white focus:ring-4 focus:ring-orange-100"
+                />
+              </div>
 
               <button
                 type="button"
                 onClick={() =>
                   studentClassesQuery.refetch()
                 }
-                className="mt-4 rounded-xl bg-[#8b2408] px-5 py-2.5 text-sm font-bold text-white"
+                disabled={
+                  studentClassesQuery.isFetching ||
+                  selectedClassId === undefined
+                }
+                className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-[#dfd0ca] text-[#76564b] transition hover:bg-[#fff0eb] disabled:opacity-60"
+                aria-label="Refresh assignments"
               >
-                Isku day mar kale
+                <RefreshCw
+                  size={18}
+                  className={
+                    studentClassesQuery.isFetching
+                      ? "animate-spin"
+                      : ""
+                  }
+                />
               </button>
+            </div>
+          </div>
+
+          {/* Class filter dropdown */}
+          <div className="flex items-center gap-3">
+            <School
+              size={18}
+              className="shrink-0 text-[#8b2408]"
+            />
+
+            <div className="relative flex-1 sm:max-w-sm">
+              <select
+                id="class-filter"
+                value={
+                  selectedClassId !== undefined
+                    ? String(selectedClassId)
+                    : ""
+                }
+                disabled={classesQuery.isLoading}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setSelectedClassId(
+                    value === ""
+                      ? undefined
+                      : Number(value),
+                  );
+                  setSearchValue("");
+                }}
+                className="h-10 w-full appearance-none rounded-xl border border-[#dfd0ca] bg-[#fffaf8] px-4 pr-8 text-sm font-semibold text-[#30201a] outline-none transition focus:border-[#8b2408] focus:bg-white focus:ring-4 focus:ring-orange-100 disabled:opacity-60"
+              >
+                <option value="">
+                  {classesQuery.isLoading
+                    ? "Fasallada waa la soo qaadayaa..."
+                    : "— Dooro fasal —"}
+                </option>
+
+                {classes.map((schoolClass) => (
+                  <option
+                    key={schoolClass.id}
+                    value={schoolClass.id}
+                  >
+                    {schoolClass.title} —{" "}
+                    {schoolClass.AcademicYear}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </header>
+
+        {/* Prompt when no class selected */}
+        {selectedClassId === undefined && (
+          <div className="flex min-h-72 items-center justify-center p-6 text-center">
+            <div>
+              <School
+                size={42}
+                className="mx-auto text-[#b98b7d]"
+              />
+
+              <h3 className="mt-4 font-black text-[#30201a]">
+                Fasal dooro
+              </h3>
+
+              <p className="mt-2 text-sm text-slate-500">
+                Dooro fasal kore si aad u aragto
+                ardayda ku jira.
+              </p>
             </div>
           </div>
         )}
 
-        {!studentClassesQuery.isLoading &&
+        {selectedClassId !== undefined &&
+          studentClassesQuery.isLoading && (
+            <div className="flex min-h-72 items-center justify-center">
+              <div className="text-center">
+                <LoaderCircle
+                  size={34}
+                  className="mx-auto animate-spin text-[#8b2408]"
+                />
+
+                <p className="mt-3 text-sm text-slate-500">
+                  Xogta waa la soo qaadayaa...
+                </p>
+              </div>
+            </div>
+          )}
+
+        {selectedClassId !== undefined &&
+          studentClassesQuery.isError && (
+            <div className="flex min-h-72 items-center justify-center p-6 text-center">
+              <div>
+                <AlertCircle
+                  size={38}
+                  className="mx-auto text-red-500"
+                />
+
+                <h3 className="mt-4 font-black text-[#30201a]">
+                  Xogta lama soo heli karin
+                </h3>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    studentClassesQuery.refetch()
+                  }
+                  className="mt-4 rounded-xl bg-[#8b2408] px-5 py-2.5 text-sm font-bold text-white"
+                >
+                  Isku day mar kale
+                </button>
+              </div>
+            </div>
+          )}
+
+        {selectedClassId !== undefined &&
+          !studentClassesQuery.isLoading &&
           !studentClassesQuery.isError &&
           filteredAssignments.length === 0 && (
             <div className="flex min-h-72 items-center justify-center p-6 text-center">
@@ -611,7 +709,8 @@ function StudentClassesPage() {
             </div>
           )}
 
-        {!studentClassesQuery.isLoading &&
+        {selectedClassId !== undefined &&
+          !studentClassesQuery.isLoading &&
           !studentClassesQuery.isError &&
           filteredAssignments.length > 0 && (
             <>
@@ -643,6 +742,10 @@ function StudentClassesPage() {
                       <th className="px-6 py-4 text-xs font-black uppercase tracking-wide text-slate-500">
                         Taariikhda
                       </th>
+
+                      <th className="px-6 py-4 text-xs font-black uppercase tracking-wide text-slate-500">
+                        Ficil
+                      </th>
                     </tr>
                   </thead>
 
@@ -658,6 +761,11 @@ function StudentClassesPage() {
                             assignment.Student
                               ?.last_name,
                           );
+
+                        const isDeactivating =
+                          deactivateMutation.isPending &&
+                          deactivateMutation.variables ===
+                            assignment.student_id;
 
                         return (
                           <tr
@@ -722,6 +830,32 @@ function StudentClassesPage() {
                                 assignment.Createdat,
                               )}
                             </td>
+
+                            <td className="px-6 py-4">
+                              {assignment.is_active && (
+                                <button
+                                  type="button"
+                                  disabled={isDeactivating}
+                                  onClick={() =>
+                                    handleDeactivate(
+                                      assignment.student_id,
+                                    )
+                                  }
+                                  title="Fasalka ka saar"
+                                  className="flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-black text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                  {isDeactivating ? (
+                                    <LoaderCircle
+                                      size={14}
+                                      className="animate-spin"
+                                    />
+                                  ) : (
+                                    <UserMinus size={14} />
+                                  )}
+                                  Deactivate
+                                </button>
+                              )}
+                            </td>
                           </tr>
                         );
                       },
@@ -733,79 +867,109 @@ function StudentClassesPage() {
               {/* Mobile cards */}
               <div className="space-y-3 p-4 md:hidden">
                 {filteredAssignments.map(
-                  (assignment) => (
-                    <article
-                      key={assignment.id}
-                      className="rounded-xl border border-[#eadbd5] bg-[#fffaf8] p-4"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#fff0eb] text-[#8b2408]">
-                          <GraduationCap
-                            size={21}
-                          />
+                  (assignment) => {
+                    const isDeactivating =
+                      deactivateMutation.isPending &&
+                      deactivateMutation.variables ===
+                        assignment.student_id;
+
+                    return (
+                      <article
+                        key={assignment.id}
+                        className="rounded-xl border border-[#eadbd5] bg-[#fffaf8] p-4"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#fff0eb] text-[#8b2408]">
+                            <GraduationCap
+                              size={21}
+                            />
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <h3 className="truncate font-black capitalize text-[#30201a]">
+                              {getStudentFullName(
+                                assignment.Student
+                                  ?.first_name,
+                                assignment.Student
+                                  ?.middle_name,
+                                assignment.Student
+                                  ?.last_name,
+                              )}
+                            </h3>
+
+                            <p className="mt-1 text-sm font-semibold text-blue-700">
+                              {assignment.Student
+                                ?.student_code ?? "—"}
+                            </p>
+                          </div>
+
+                          <span
+                            className={`rounded-full px-2.5 py-1 text-[10px] font-black ${
+                              assignment.is_active
+                                ? "bg-emerald-50 text-emerald-700"
+                                : "bg-slate-100 text-slate-600"
+                            }`}
+                          >
+                            {assignment.is_active
+                              ? "ACTIVE"
+                              : "INACTIVE"}
+                          </span>
                         </div>
 
-                        <div className="min-w-0 flex-1">
-                          <h3 className="truncate font-black capitalize text-[#30201a]">
-                            {getStudentFullName(
-                              assignment.Student
-                                ?.first_name,
-                              assignment.Student
-                                ?.middle_name,
-                              assignment.Student
-                                ?.last_name,
-                            )}
-                          </h3>
+                        <div className="mt-4 grid gap-3 border-t border-[#eadbd5] pt-4 text-sm text-slate-600">
+                          <p className="flex items-center gap-2">
+                            <School
+                              size={16}
+                              className="text-[#8b2408]"
+                            />
 
-                          <p className="mt-1 text-sm font-semibold text-blue-700">
-                            {assignment.Student
-                              ?.student_code ?? "—"}
+                            <span className="font-bold">
+                              {assignment.Class
+                                ?.title ?? "—"}
+                            </span>
                           </p>
-                        </div>
 
-                        <span
-                          className={`rounded-full px-2.5 py-1 text-[10px] font-black ${
-                            assignment.is_active
-                              ? "bg-emerald-50 text-emerald-700"
-                              : "bg-slate-100 text-slate-600"
-                          }`}
-                        >
-                          {assignment.is_active
-                            ? "ACTIVE"
-                            : "INACTIVE"}
-                        </span>
-                      </div>
+                          <p>
+                            Academic Year:{" "}
+                            <span className="font-bold">
+                              {assignment.Class
+                                ?.AcademicYear ?? "—"}
+                            </span>
+                          </p>
 
-                      <div className="mt-4 grid gap-3 border-t border-[#eadbd5] pt-4 text-sm text-slate-600">
-                        <p className="flex items-center gap-2">
-                          <School
-                            size={16}
-                            className="text-[#8b2408]"
-                          />
+                          <p>
+                            Taariikhda:{" "}
+                            {formatDate(
+                              assignment.Createdat,
+                            )}
+                          </p>
 
-                          <span className="font-bold">
-                            {assignment.Class
-                              ?.title ?? "—"}
-                          </span>
-                        </p>
-
-                        <p>
-                          Academic Year:{" "}
-                          <span className="font-bold">
-                            {assignment.Class
-                              ?.AcademicYear ?? "—"}
-                          </span>
-                        </p>
-
-                        <p>
-                          Taariikhda:{" "}
-                          {formatDate(
-                            assignment.Createdat,
+                          {assignment.is_active && (
+                            <button
+                              type="button"
+                              disabled={isDeactivating}
+                              onClick={() =>
+                                handleDeactivate(
+                                  assignment.student_id,
+                                )
+                              }
+                              className="flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 py-2 text-sm font-black text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                              {isDeactivating ? (
+                                <LoaderCircle
+                                  size={15}
+                                  className="animate-spin"
+                                />
+                              ) : (
+                                <UserMinus size={15} />
+                              )}
+                              Fasalka Ka Saar
+                            </button>
                           )}
-                        </p>
-                      </div>
-                    </article>
-                  ),
+                        </div>
+                      </article>
+                    );
+                  },
                 )}
               </div>
             </>

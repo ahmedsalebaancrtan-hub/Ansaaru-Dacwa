@@ -19,7 +19,7 @@ func DbConnect() {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	db.AutoMigrate(models.User{}, models.PasswordResetToken{})
+	db.AutoMigrate(models.User{}, models.PasswordResetToken{}, models.Class{}, models.Family{}, models.Student{}, models.StudentClass{})
 	DB = db
 
 }

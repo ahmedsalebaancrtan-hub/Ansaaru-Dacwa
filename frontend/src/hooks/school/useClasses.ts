@@ -9,8 +9,10 @@ import toast from "react-hot-toast";
 import {
   createClass,
   getClasses,
+  updateClass,
 } from "../../api/school/classes.api";
 
+import type { UpdateClassRequest } from "../../types/Admin/class.types";
 import { getApiErrorMessage } from "../../utils/getApiErrorMessage";
 
 const classesQueryKey = ["school-classes"];
@@ -31,7 +33,6 @@ export function useCreateClass() {
     onSuccess: async () => {
       toast.success("Class-ka si guul leh ayaa loo sameeyay");
 
-      // Dib u soo qaad class list-ka kadib create.
       await queryClient.invalidateQueries({
         queryKey: classesQueryKey,
       });
@@ -42,6 +43,39 @@ export function useCreateClass() {
         getApiErrorMessage(
           error,
           "Class-ka lama samayn karin",
+        ),
+      );
+    },
+  });
+}
+
+export function useUpdateClass() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      classId,
+      data,
+    }: {
+      classId: number;
+      data: UpdateClassRequest;
+    }) => updateClass(classId, data),
+
+    onSuccess: async () => {
+      toast.success(
+        "Class-ka si guul leh ayaa loo cusboonaysiiyay",
+      );
+
+      await queryClient.invalidateQueries({
+        queryKey: classesQueryKey,
+      });
+    },
+
+    onError: (error) => {
+      toast.error(
+        getApiErrorMessage(
+          error,
+          "Class-ka lama cusboonaysiin karin",
         ),
       );
     },

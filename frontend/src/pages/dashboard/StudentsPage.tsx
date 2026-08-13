@@ -23,44 +23,80 @@ import {
   useStudents,
 } from "../../hooks/school/useStudents";
 
+<<<<<<< HEAD
 import { useClasses } from "../../hooks/school/useClasses";
 import { useFamilies } from "../../hooks/school/useFamilies";
+=======
+import { useFamilies } from "../../hooks/school/useFamilies";
+
+import type {
+  StudentGender,
+} from "../../types/Admin/student.types";
+>>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
 
 interface StudentForm {
   fullName: string;
   studentCode: string;
+<<<<<<< HEAD
   classId: string;
   familyId: string;
   dateOfAdmission: string;
   discountFee: string;
   mobileNumber: string;
+=======
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  gender: StudentGender | "";
+  familyId: string;
+>>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
 }
 
 interface StudentErrors {
   fullName?: string;
   studentCode?: string;
+<<<<<<< HEAD
   classId?: string;
   familyId?: string;
   dateOfAdmission?: string;
   discountFee?: string;
   mobileNumber?: string;
+=======
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  gender?: string;
+  familyId?: string;
+>>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
 }
 
 const initialForm: StudentForm = {
   fullName: "",
   studentCode: "",
+<<<<<<< HEAD
   classId: "",
   familyId: "",
   dateOfAdmission: "",
   discountFee: "0",
   mobileNumber: "",
+=======
+  firstName: "",
+  middleName: "",
+  lastName: "",
+  gender: "",
+  familyId: "",
+>>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
 };
 
 function StudentsPage() {
   const studentsQuery = useStudents();
+<<<<<<< HEAD
   const classesQuery = useClasses();
   const familiesQuery = useFamilies();
 
+=======
+  const familiesQuery = useFamilies();
+>>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
   const createStudentMutation =
     useCreateStudent();
 
@@ -162,6 +198,7 @@ function StudentsPage() {
       form.discountFee,
     );
 
+<<<<<<< HEAD
     if (
       Number.isNaN(discount) ||
       discount < 0 ||
@@ -178,6 +215,11 @@ function StudentsPage() {
     ) {
       newErrors.mobileNumber =
         "Geli mobile sax ah";
+=======
+    if (!form.familyId) {
+      newErrors.familyId =
+        "Fadlan dooro qoyska";
+>>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
     }
 
     return newErrors;
@@ -200,6 +242,7 @@ function StudentsPage() {
 
     createStudentMutation.mutate(
       {
+<<<<<<< HEAD
         full_name: form.fullName.trim(),
         student_code:
           form.studentCode.trim(),
@@ -219,6 +262,14 @@ function StudentsPage() {
           form.mobileNumber
             .replace(/\s+/g, "")
             .trim(),
+=======
+        first_name: form.firstName.trim(),
+        middle_name: form.middleName.trim(),
+        last_name: form.lastName.trim(),
+        student_code: form.studentCode.trim(),
+        family_id: Number(form.familyId),
+        gender: form.gender,
+>>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
       },
       {
         onSuccess: () => {
@@ -406,7 +457,125 @@ function StudentsPage() {
 
             {/* Family */}
             <div>
+<<<<<<< HEAD
               <label className="mb-0.5 block text-[9px] font-bold text-[#51433e]">
+=======
+              <label
+                htmlFor="middle-name"
+                className="mb-2 block text-sm font-bold text-[#51433e]"
+              >
+                Magaca Dhexe
+              </label>
+
+              <input
+                id="middle-name"
+                value={form.middleName}
+                onChange={(event) =>
+                  updateField(
+                    "middleName",
+                    event.target.value,
+                  )
+                }
+                placeholder="Saleban"
+                className={`h-12 w-full rounded-xl border bg-[#fff8f5] px-4 outline-none transition focus:bg-white focus:ring-4 ${
+                  errors.middleName
+                    ? "border-red-400 focus:ring-red-100"
+                    : "border-[#dfcbc4] focus:border-[#8b2408] focus:ring-orange-100"
+                }`}
+              />
+
+              {errors.middleName && (
+                <p className="mt-2 text-sm text-red-600">
+                  {errors.middleName}
+                </p>
+              )}
+            </div>
+
+            {/* Last name */}
+            <div>
+              <label
+                htmlFor="last-name"
+                className="mb-2 block text-sm font-bold text-[#51433e]"
+              >
+                Magaca Dambe
+              </label>
+
+              <input
+                id="last-name"
+                value={form.lastName}
+                onChange={(event) =>
+                  updateField(
+                    "lastName",
+                    event.target.value,
+                  )
+                }
+                placeholder="Cartan"
+                className={`h-12 w-full rounded-xl border bg-[#fff8f5] px-4 outline-none transition focus:bg-white focus:ring-4 ${
+                  errors.lastName
+                    ? "border-red-400 focus:ring-red-100"
+                    : "border-[#dfcbc4] focus:border-[#8b2408] focus:ring-orange-100"
+                }`}
+              />
+
+              {errors.lastName && (
+                <p className="mt-2 text-sm text-red-600">
+                  {errors.lastName}
+                </p>
+              )}
+            </div>
+
+            {/* Gender */}
+            <div>
+              <label
+                htmlFor="gender"
+                className="mb-2 block text-sm font-bold text-[#51433e]"
+              >
+                Gender
+              </label>
+
+              <select
+                id="gender"
+                value={form.gender}
+                onChange={(event) =>
+                  updateField(
+                    "gender",
+                    event.target
+                      .value as StudentGender | "",
+                  )
+                }
+                className={`h-12 w-full rounded-xl border bg-[#fff8f5] px-4 outline-none transition focus:bg-white focus:ring-4 ${
+                  errors.gender
+                    ? "border-red-400 focus:ring-red-100"
+                    : "border-[#dfcbc4] focus:border-[#8b2408] focus:ring-orange-100"
+                }`}
+              >
+                <option value="">
+                  Dooro gender
+                </option>
+
+                <option value="male">
+                  Lab
+                </option>
+
+                <option value="female">
+                  Dhedig
+                </option>
+              </select>
+
+              {errors.gender && (
+                <p className="mt-2 text-sm text-red-600">
+                  {errors.gender}
+                </p>
+              )}
+            </div>
+
+            {/* Family selection */}
+            <div>
+              <label
+                htmlFor="family-id"
+                className="mb-2 block text-sm font-bold text-[#51433e]"
+              >
+>>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
                 Qoyska
               </label>
 
@@ -417,13 +586,20 @@ function StudentsPage() {
                 />
 
                 <select
+<<<<<<< HEAD
                   value={form.familyId}
+=======
+                  id="family-id"
+                  value={form.familyId}
+                  disabled={familiesQuery.isLoading}
+>>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
                   onChange={(event) =>
                     updateField(
                       "familyId",
                       event.target.value,
                     )
                   }
+<<<<<<< HEAD
                   className={`${inputClass(
                     Boolean(errors.familyId),
                   )} appearance-none pl-8`}
@@ -433,17 +609,37 @@ function StudentsPage() {
                   </option>
 
                   {families.map((family) => (
+=======
+                  className={`h-12 w-full appearance-none rounded-xl border bg-[#fff8f5] pl-12 pr-4 outline-none transition focus:bg-white focus:ring-4 disabled:cursor-not-allowed disabled:opacity-60 ${
+                    errors.familyId
+                      ? "border-red-400 focus:ring-red-100"
+                      : "border-[#dfcbc4] focus:border-[#8b2408] focus:ring-orange-100"
+                  }`}
+                >
+                  <option value="">
+                    {familiesQuery.isLoading
+                      ? "Qoysaska waa la soo qaadayaa..."
+                      : "Dooro qoyska"}
+                  </option>
+
+                  {(familiesQuery.data ?? []).map((family) => (
+>>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
                     <option
                       key={family.id}
                       value={family.id}
                     >
+<<<<<<< HEAD
                       {family.familyName}
+=======
+                      {family.familyName} — {family.Parent_one_Name}
+>>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
                     </option>
                   ))}
                 </select>
               </div>
 
               {errors.familyId && (
+<<<<<<< HEAD
                 <p className="mt-0.5 text-[8px] text-red-600">
                   {errors.familyId}
                 </p>
@@ -557,6 +753,10 @@ function StudentsPage() {
               {errors.mobileNumber && (
                 <p className="mt-0.5 text-[8px] text-red-600">
                   {errors.mobileNumber}
+=======
+                <p className="mt-2 text-sm text-red-600">
+                  {errors.familyId}
+>>>>>>> 93a7cf20e300e9cf9a36f5bd400d9f2ef5693e14
                 </p>
               )}
             </div>

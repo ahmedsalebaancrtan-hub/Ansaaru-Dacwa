@@ -34,3 +34,11 @@ export interface StudentClassesApiResponse {
   message?: string;
   messege?: string;
 }
+
+// Response-ka kasoo noqda marka arday laga deactivate gareeyo fasal.
+export interface DeactivateStudentClassApiResponse {
+  is_sucess?: boolean;
+  is_success?: boolean;
+  message?: string;
+  messege?: string;
+}

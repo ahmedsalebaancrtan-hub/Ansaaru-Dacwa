@@ -13,8 +13,14 @@ export interface CreateClassRequest {
   AcademicYear: string;
 }
 
+// Xogta loo dirayo marka class la cusboonaysiinayo.
+export interface UpdateClassRequest {
+  title: string;
+  AcademicYear: string;
+}
+
 export interface ClassApiResponse {
-  data: SchoolClass;
+  data?: SchoolClass;
   is_sucess?: boolean;
   is_success?: boolean;
   messege?: string;
@@ -22,7 +28,7 @@ export interface ClassApiResponse {
 }
 
 export interface ClassesApiResponse {
-  data: SchoolClass[];
+  data?: SchoolClass[];
   is_sucess?: boolean;
   is_success?: boolean;
   messege?: string;

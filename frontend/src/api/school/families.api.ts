@@ -2,13 +2,12 @@ import { api } from "../axiosInstance";
 
 import type {
   CreateFamilyRequest,
-  FamiliesApiResponse,
   Family,
   FamilyApiResponse,
 } from "../../types/Admin/family.types";
 
-// Haddii backend route-ku ka duwan yahay, halkaan beddel.
-const FAMILY_ENDPOINT = "/api/v1/families";
+// POST /api/family/create  — roles: ADMIN | CASHIER
+const FAMILY_CREATE_ENDPOINT = "/api/family/create";
 
 function getErrorMessage(
   response: {
@@ -24,14 +23,18 @@ function getErrorMessage(
   );
 }
 
+const FAMILY_LIST_ENDPOINT = "/api/family/list";
+
+// GET /api/family/list
 export async function getFamilies(): Promise<Family[]> {
-  const { data: response } =
-    await api.get<FamiliesApiResponse>(
-      FAMILY_ENDPOINT,
-    );
+  const { data: response } = await api.get<{
+    data?: Family[];
+    is_success?: boolean;
+    messege?: string;
+    message?: string;
+  }>(FAMILY_LIST_ENDPOINT);
 
   const requestWasSuccessful =
-    response.is_sucess !== false &&
     response.is_success !== false;
 
   if (!requestWasSuccessful) {
@@ -46,12 +49,13 @@ export async function getFamilies(): Promise<Family[]> {
   return response.data ?? [];
 }
 
+// POST /api/family/create
 export async function createFamily(
   request: CreateFamilyRequest,
 ): Promise<Family | null> {
   const { data: response } =
     await api.post<FamilyApiResponse>(
-      FAMILY_ENDPOINT,
+      FAMILY_CREATE_ENDPOINT,
       request,
     );
 
